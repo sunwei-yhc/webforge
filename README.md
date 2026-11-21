@@ -13,4 +13,16 @@
 ```
 
 AAR 输出为 `WebForge/build/outputs/aar/WebForge-release.aar`。
-Maven 发布坐标配置为 `io.github.sunwei:webforge:0.1.1`。
+Maven 发布坐标配置为 `io.github.sunwei:webforge:0.1.4`。
+
+从 GitHub 标签通过 JitPack 使用：
+
+```groovy
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation 'com.github.sunwei-yhc:webforge:v0.1.4'
+}
+```

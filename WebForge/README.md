@@ -7,14 +7,21 @@
 
 - 库名称、目录及 Gradle 模块：`WebForge` / `:WebForge`。
 - namespace 与基础包名：`io.github.sunwei.webforge`。
-- Maven 坐标：`io.github.sunwei:webforge:0.1.1`（发布配置）。
+- Maven 坐标：`io.github.sunwei:webforge:0.1.4`（本地/其他 Maven 仓库发布配置）。
+- JitPack 坐标：`com.github.sunwei-yhc:webforge:v0.1.4`。
 - Release 产物：`WebForge/build/outputs/aar/WebForge-release.aar`。
-- 版本统一在 `build.gradle` 的 `project.version` 中维护，运行时返回 `WebForge/0.1.1`。
+- 版本统一在 `build.gradle` 的 `project.version` 中维护，运行时返回 `WebForge/0.1.4`。
 
 工程内使用：
 
 ```groovy
 implementation project(':WebForge')
+```
+
+通过 JitPack 使用时，在项目仓库中添加 `https://jitpack.io`，然后依赖：
+
+```groovy
+implementation 'com.github.sunwei-yhc:webforge:v0.1.4'
 ```
 
 ## 目录分层
