@@ -69,7 +69,7 @@ afterEvaluate {
                 pom {
                     name = 'WebForge'
                     description = 'WebForge Android WebView framework'
-                    url = 'https://github.com/sunwei/framemodule'
+                    url = 'https://github.com/sunwei-yhc/webforge'
                     licenses {
                         license {
                             name = 'MIT License'
@@ -84,9 +84,9 @@ afterEvaluate {
                         }
                     }
                     scm {
-                        connection = 'scm:git@github.com:sunwei/framemodule.git'
-                        developerConnection = 'scm:git@github.com:sunwei/framemodule.git'
-                        url = 'https://github.com/sunwei/framemodule'
+                        connection = 'scm:git@github.com:sunwei-yhc/webforge.git'
+                        developerConnection = 'scm:git@github.com:sunwei-yhc/webforge.git'
+                        url = 'https://github.com/sunwei-yhc/webforge'
                     }
                 }
             }
@@ -94,7 +94,7 @@ afterEvaluate {
         repositories {
             maven {
                 name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/sunwei/framemodule")
+                url = uri("https://maven.pkg.github.com/sunwei-yhc/webforge")
                 credentials {
                     username = System.getenv("GITHUB_ACTOR")
                     password = System.getenv("GITHUB_TOKEN")
