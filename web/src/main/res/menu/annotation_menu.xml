@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/custom_button"
+        android:icon="@drawable/ic_launcher_background"
+        android:title="@string/copy"
+        app:showAsAction="always">
+    </item>
+
+    <item
+        android:id="@+id/custom_button2"
+        android:icon="@drawable/ic_launcher_background"
+        android:title="@string/zt"
+        app:showAsAction="ifRoom">
+    </item>
+
+</menu>

@@ -1,0 +1,3 @@
+rootProject.name = "perfactwebview"
+include ':WebForge'
+include ':web'

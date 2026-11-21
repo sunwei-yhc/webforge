@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingLeft="20dp"
+    android:paddingStart="20dp"
+    android:paddingTop="10dp"
+    android:paddingRight="20dp"
+    android:paddingEnd="20dp"
+    android:paddingBottom="18dp"
+    android:background="@drawable/webforge_chooser_sheet_bg">
+
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/webforge_chooser_handle_bg" />
+
+    <TextView
+        android:id="@+id/webforge_chooser_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:text="@string/webforge_chooser_title"
+        android:textColor="@color/webforge_chooser_ink"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/webforge_chooser_subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:lineSpacingExtra="2dp"
+        android:text="@string/webforge_chooser_subtitle"
+        android:textColor="@color/webforge_chooser_muted"
+        android:textSize="13sp" />
+
+    <LinearLayout
+        android:id="@+id/webforge_chooser_camera_option"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/webforge_chooser_option_bg"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:minHeight="82dp"
+        android:orientation="horizontal"
+        android:padding="14dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/webforge_chooser_icon_bg"
+            android:importantForAccessibility="no"
+            android:padding="12dp"
+            app:srcCompat="@drawable/webforge_ic_chooser_camera" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="14dp"
+            android:layout_marginStart="14dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/webforge_chooser_camera_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/webforge_camera"
+                android:textColor="@color/webforge_chooser_ink"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="@string/webforge_chooser_camera_desc"
+                android:textColor="@color/webforge_chooser_muted"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="24dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:importantForAccessibility="no"
+            android:text="@string/webforge_chooser_chevron"
+            android:textColor="@color/webforge_chooser_chevron"
+            android:textSize="24sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/webforge_chooser_file_option"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/webforge_chooser_option_bg"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:minHeight="82dp"
+        android:orientation="horizontal"
+        android:padding="14dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/webforge_chooser_icon_bg"
+            android:importantForAccessibility="no"
+            android:padding="12dp"
+            app:srcCompat="@drawable/webforge_ic_chooser_folder" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="14dp"
+            android:layout_marginStart="14dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/webforge_chooser_file_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/webforge_file_chooser"
+                android:textColor="@color/webforge_chooser_ink"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="@string/webforge_chooser_file_desc"
+                android:textColor="@color/webforge_chooser_muted"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="24dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:importantForAccessibility="no"
+            android:text="@string/webforge_chooser_chevron"
+            android:textColor="@color/webforge_chooser_chevron"
+            android:textSize="24sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/webforge_chooser_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/webforge_chooser_cancel_bg"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:text="@string/webforge_chooser_cancel"
+        android:textColor="@color/webforge_chooser_brand"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+</LinearLayout>

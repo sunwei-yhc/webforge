@@ -1,0 +1,18 @@
+// javac records parameter flags in the MethodParameters attribute. Whenever a parameter is
+// synthetic or mandated (enum fields, anonymous/inner-class outer references, ...) and the
+// attribute carries no name, its name_index stays 0. The R8/D8 shipped with AGP 7.2 cannot read
+// that and dies with:
+//
+//     java.lang.NullPointerException
+//     Execution failed for task ':web:desugarDebugFileDependencies' ... Error while dexing.
+//
+// Passing -parameters makes javac emit real names for those parameters, so D8 is happy.
+//
+// The task type is matched dynamically instead of via `withType(JavaCompile)`: referencing Gradle
+// API types here makes Groovy resolve the JDK classpath while compiling the script, which fails
+// with "Unsupported class file major version 69" on the JDK 25 toolchain used by this project.
+tasks.configureEach { t ->
+    if (t.hasProperty('options') && t.options.hasProperty('compilerArgs')) {
+        t.options.compilerArgs.add('-parameters')
+    }
+}

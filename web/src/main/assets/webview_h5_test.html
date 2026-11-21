@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0f172a">
+    <title>Frameweb H5 能力测试</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --bg: #eef2f6;
+            --card: #ffffff;
+            --ink: #172033;
+            --muted: #697386;
+            --line: #dbe2ea;
+            --brand: #0f766e;
+            --brand-strong: #115e59;
+            --brand-soft: #d9f3ef;
+            --blue: #2457d6;
+            --amber: #a16207;
+            --amber-soft: #fff4d6;
+            --danger: #b42318;
+            --danger-soft: #fee4e2;
+            --ok: #067647;
+            --ok-soft: #dcfae6;
+            --radius: 18px;
+            --shadow: 0 10px 30px rgba(28, 43, 64, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 95% 0%, rgba(15, 118, 110, 0.16), transparent 28rem),
+                linear-gradient(180deg, #edf2f7 0%, var(--bg) 100%);
+            color: var(--ink);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                         "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            line-height: 1.55;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            min-height: 44px;
+            border: 0;
+            border-radius: 12px;
+            padding: 10px 14px;
+            color: #ffffff;
+            background: var(--brand);
+            font-weight: 650;
+            cursor: pointer;
+            transition: transform 120ms ease, filter 120ms ease;
+        }
+
+        button:active {
+            transform: translateY(1px) scale(0.99);
+            filter: brightness(0.94);
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.48;
+        }
+
+        button.secondary {
+            color: var(--ink);
+            background: #edf1f5;
+        }
+
+        button.danger {
+            background: var(--danger);
+        }
+
+        button.blue {
+            background: var(--blue);
+        }
+
+        button.amber {
+            color: #5d3d00;
+            background: #ffd66b;
+        }
+
+        input[type="text"],
+        input[type="url"] {
+            width: 100%;
+            min-height: 44px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 10px 12px;
+            color: var(--ink);
+            background: #f9fbfc;
+            outline: none;
+        }
+
+        input[type="text"]:focus,
+        input[type="url"]:focus {
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.13);
+        }
+
+        code,
+        pre {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        }
+
+        .hero {
+            padding: calc(24px + env(safe-area-inset-top)) 18px 52px;
+            color: #ffffff;
+            background:
+                linear-gradient(130deg, rgba(255,255,255,0.08), transparent 45%),
+                linear-gradient(135deg, #0f172a 0%, #134e4a 72%, #0f766e 100%);
+            border-radius: 0 0 30px 30px;
+        }
+
+        .hero-inner,
+        .content {
+            width: min(100%, 920px);
+            margin: 0 auto;
+        }
+
+        .eyebrow {
+            margin: 0 0 7px;
+            color: #99f6e4;
+            font-size: 12px;
+            font-weight: 750;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(26px, 7vw, 42px);
+            line-height: 1.15;
+            letter-spacing: -0.035em;
+        }
+
+        .subtitle {
+            max-width: 680px;
+            margin: 12px 0 0;
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .hero-actions button {
+            color: #0f172a;
+            background: #ffffff;
+        }
+
+        .hero-actions button:last-child {
+            color: #ffffff;
+            background: rgba(255,255,255,0.14);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            margin-top: -28px;
+            padding: 0 14px calc(32px + env(safe-area-inset-bottom));
+        }
+
+        .status-board {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            padding: 14px;
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .metric {
+            min-width: 0;
+            padding: 12px;
+            background: #f7f9fb;
+            border: 1px solid #edf1f5;
+            border-radius: 13px;
+        }
+
+        .metric-label {
+            display: block;
+            margin-bottom: 4px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .metric-value {
+            display: block;
+            overflow: hidden;
+            font-size: 14px;
+            font-weight: 720;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .section {
+            margin-top: 16px;
+            padding: 18px;
+            background: var(--card);
+            border: 1px solid rgba(219, 226, 234, 0.85);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .section-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .section h2 {
+            margin: 0;
+            font-size: 18px;
+            letter-spacing: -0.015em;
+        }
+
+        .section p {
+            margin: 5px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            min-height: 26px;
+            border-radius: 999px;
+            padding: 3px 10px;
+            color: var(--muted);
+            background: #edf1f5;
+            font-size: 11px;
+            font-weight: 750;
+            white-space: nowrap;
+        }
+
+        .badge.ok {
+            color: var(--ok);
+            background: var(--ok-soft);
+        }
+
+        .badge.warn {
+            color: var(--amber);
+            background: var(--amber-soft);
+        }
+
+        .badge.error {
+            color: var(--danger);
+            background: var(--danger-soft);
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .button-grid.three {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .button-grid button {
+            width: 100%;
+            padding-right: 8px;
+            padding-left: 8px;
+            font-size: 13px;
+        }
+
+        .field {
+            display: grid;
+            gap: 7px;
+            margin-top: 12px;
+        }
+
+        .field-label {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .inline-field {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+        }
+
+        .permission-list {
+            display: grid;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .permission-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 12px;
+            background: #f7f9fb;
+            border-radius: 12px;
+        }
+
+        .permission-name {
+            font-size: 13px;
+            font-weight: 680;
+        }
+
+        .permission-type {
+            display: block;
+            color: var(--muted);
+            font-family: "SFMono-Regular", Consolas, monospace;
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .file-picker {
+            position: relative;
+            display: flex;
+            min-height: 86px;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px dashed #b8c4d2;
+            border-radius: 14px;
+            padding: 12px;
+            color: var(--brand-strong);
+            background: #f7fbfa;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 720;
+            cursor: pointer;
+        }
+
+        .file-picker input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+        }
+
+        .file-picker:active {
+            background: var(--brand-soft);
+        }
+
+        .file-results {
+            display: grid;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .file-item {
+            display: grid;
+            grid-template-columns: 48px 1fr;
+            gap: 10px;
+            align-items: center;
+            padding: 9px;
+            background: #f7f9fb;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .file-item img,
+        .file-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 9px;
+            object-fit: cover;
+            background: #e5ebf1;
+        }
+
+        .file-icon {
+            display: grid;
+            place-items: center;
+            color: var(--muted);
+            font-size: 20px;
+        }
+
+        .file-meta {
+            min-width: 0;
+        }
+
+        .file-name {
+            overflow: hidden;
+            font-weight: 700;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .file-detail {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .media-preview {
+            display: block;
+            width: 100%;
+            max-height: 300px;
+            margin-top: 12px;
+            border-radius: 14px;
+            background: #111827;
+            object-fit: contain;
+        }
+
+        .audio-preview {
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        .result-box {
+            margin-top: 12px;
+            padding: 12px;
+            overflow-wrap: anywhere;
+            border-radius: 12px;
+            color: #314052;
+            background: #f4f7fa;
+            font-size: 12px;
+        }
+
+        .result-box strong {
+            color: var(--ink);
+        }
+
+        .log {
+            max-height: 320px;
+            margin: 12px 0 0;
+            padding: 0;
+            overflow: auto;
+            color: #d8e3f1;
+            background: #111827;
+            border-radius: 14px;
+            list-style: none;
+        }
+
+        .log li {
+            padding: 9px 11px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            font-family: "SFMono-Regular", Consolas, monospace;
+            font-size: 11px;
+            line-height: 1.55;
+            overflow-wrap: anywhere;
+        }
+
+        .log li:last-child {
+            border-bottom: 0;
+        }
+
+        .log-time {
+            margin-right: 6px;
+            color: #7dd3fc;
+        }
+
+        .log-ok {
+            color: #86efac;
+        }
+
+        .log-error {
+            color: #fca5a5;
+        }
+
+        .log-warn {
+            color: #fde68a;
+        }
+
+        .hint {
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .hint code {
+            padding: 2px 5px;
+            border-radius: 5px;
+            color: #0f4c46;
+            background: var(--brand-soft);
+        }
+
+        .footer {
+            padding: 22px 4px 4px;
+            color: var(--muted);
+            font-size: 11px;
+            text-align: center;
+        }
+
+        @media (min-width: 680px) {
+            .status-board {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+
+            .file-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+
+            .permission-list {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 370px) {
+            .button-grid,
+            .button-grid.three {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<header class="hero">
+    <div class="hero-inner">
+        <p class="eyebrow">Frameweb Module · H5 Lab</p>
+        <h1>WebView 常用能力测试</h1>
+        <p class="subtitle">
+            一个页面覆盖原生桥接、权限、文件上传、音视频、定位、存储、网络、弹窗与导航。
+            首次打开可先运行基础自检，再按需触发系统能力。
+        </p>
+        <div class="hero-actions">
+            <button type="button" id="runSelfCheck">运行基础自检</button>
+            <button type="button" data-scroll="#nativeBridge">查看原生接口</button>
+        </div>
+    </div>
+</header>
+
+<main class="content">
+    <section class="status-board" aria-label="运行环境">
+        <div class="metric">
+            <span class="metric-label">Native Bridge</span>
+            <span class="metric-value" id="metricBridge">检测中</span>
+        </div>
+        <div class="metric">
+            <span class="metric-label">Network</span>
+            <span class="metric-value" id="metricNetwork">检测中</span>
+        </div>
+        <div class="metric">
+            <span class="metric-label">Storage</span>
+            <span class="metric-value" id="metricStorage">检测中</span>
+        </div>
+        <div class="metric">
+            <span class="metric-label">Media APIs</span>
+            <span class="metric-value" id="metricMedia">检测中</span>
+        </div>
+    </section>
+
+    <section class="section" id="environment">
+        <div class="section-head">
+            <div>
+                <h2>环境与能力</h2>
+                <p>检查当前页面是否具备现代 H5 运行条件。</p>
+            </div>
+            <span class="badge" id="environmentBadge">待检测</span>
+        </div>
+        <div class="result-box" id="environmentResult">
+            点击“运行基础自检”获取 WebView、网络和 API 支持信息。
+        </div>
+    </section>
+
+    <section class="section" id="permissions">
+        <div class="section-head">
+            <div>
+                <h2>运行时权限</h2>
+                <p>通过 window.Android 主动申请，并验证权限结果回调。</p>
+            </div>
+            <button type="button" class="secondary" id="refreshPermissions">刷新</button>
+        </div>
+
+        <div class="permission-list" id="permissionList">
+            <div class="permission-row">
+                <div>
+                    <span class="permission-name">相机</span>
+                    <span class="permission-type">camera</span>
+                </div>
+                <button type="button" data-permission="camera">申请</button>
+            </div>
+            <div class="permission-row">
+                <div>
+                    <span class="permission-name">麦克风</span>
+                    <span class="permission-type">audio</span>
+                </div>
+                <button type="button" data-permission="audio">申请</button>
+            </div>
+            <div class="permission-row">
+                <div>
+                    <span class="permission-name">定位</span>
+                    <span class="permission-type">location</span>
+                </div>
+                <button type="button" data-permission="location">申请</button>
+            </div>
+            <div class="permission-row">
+                <div>
+                    <span class="permission-name">通话</span>
+                    <span class="permission-type">call</span>
+                </div>
+                <button type="button" data-permission="call">申请</button>
+            </div>
+            <div class="permission-row">
+                <div>
+                    <span class="permission-name">媒体文件</span>
+                    <span class="permission-type">media</span>
+                </div>
+                <button type="button" data-permission="media">申请</button>
+            </div>
+            <div class="permission-row">
+                <div>
+                    <span class="permission-name">相机 + 麦克风</span>
+                    <span class="permission-type">camera,audio</span>
+                </div>
+                <button type="button" data-permission="camera,audio">申请</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="files">
+        <div class="section-head">
+            <div>
+                <h2>文件上传与拍摄</h2>
+                <p>验证 input[type=file]、多选、拍照、录像和音频文件。</p>
+            </div>
+            <span class="badge" id="fileBadge">未选择</span>
+        </div>
+        <div class="file-grid">
+            <label class="file-picker">
+                选择图片
+                <input type="file" accept="image/*" data-file-kind="image">
+            </label>
+            <label class="file-picker">
+                直接拍照
+                <input type="file" accept="image/*" capture="environment" data-file-kind="camera">
+            </label>
+            <label class="file-picker">
+                选择视频
+                <input type="file" accept="video/*" data-file-kind="video">
+            </label>
+            <label class="file-picker">
+                直接录像
+                <input type="file" accept="video/*" capture="environment" data-file-kind="capture-video">
+            </label>
+            <label class="file-picker">
+                选择音频
+                <input type="file" accept="audio/*" data-file-kind="audio-file">
+            </label>
+            <label class="file-picker">
+                多文件选择
+                <input type="file" accept="*/*" multiple data-file-kind="multiple">
+            </label>
+            <label class="file-picker">
+                任意文件
+                <input type="file" accept="*/*" data-file-kind="file">
+            </label>
+        </div>
+        <div class="file-results" id="fileResults"></div>
+    </section>
+
+    <section class="section" id="camera">
+        <div class="section-head">
+            <div>
+                <h2>实时摄像头</h2>
+                <p>通过 getUserMedia 验证 WebChromeClient 权限申请链路。</p>
+            </div>
+            <span class="badge" id="cameraBadge">未启动</span>
+        </div>
+        <div class="button-grid">
+            <button type="button" id="startCamera">打开后置摄像头</button>
+            <button type="button" class="secondary" id="stopCamera">停止摄像头</button>
+        </div>
+        <video class="media-preview" id="cameraPreview" autoplay playsinline muted></video>
+        <p class="hint">
+            若提示非安全上下文，请改用 HTTPS 页面测试；本页面也可直接验证“选择图片/直接拍照”链。
+        </p>
+    </section>
+
+    <section class="section" id="recording">
+        <div class="section-head">
+            <div>
+                <h2>麦克风录音</h2>
+                <p>申请麦克风权限、录制 MediaRecorder 音频并回放。</p>
+            </div>
+            <span class="badge" id="recordBadge">未录音</span>
+        </div>
+        <div class="button-grid three">
+            <button type="button" id="startRecording">开始录音</button>
+            <button type="button" class="secondary" id="stopRecording" disabled>停止录音</button>
+            <button type="button" class="secondary" id="releaseRecording">释放资源</button>
+        </div>
+        <audio class="audio-preview" id="recordingPreview" controls></audio>
+    </section>
+
+    <section class="section" id="location">
+        <div class="section-head">
+            <div>
+                <h2>定位</h2>
+                <p>触发 Geolocation 权限、GPS 定位并展示精度。</p>
+            </div>
+            <span class="badge" id="locationBadge">未定位</span>
+        </div>
+        <div class="button-grid">
+            <button type="button" id="getLocation">获取当前位置</button>
+            <button type="button" class="secondary" id="watchLocation">持续定位</button>
+        </div>
+        <div class="result-box" id="locationResult">尚未获取位置。</div>
+    </section>
+
+    <section class="section" id="storageNetwork">
+        <div class="section-head">
+            <div>
+                <h2>存储、Cookie 与网络</h2>
+                <p>验证 DOM Storage、IndexedDB、Cookie 和在线请求。</p>
+            </div>
+            <span class="badge" id="onlineBadge">在线状态</span>
+        </div>
+        <div class="field">
+            <label class="field-label" for="storageValue">localStorage 测试值</label>
+            <div class="inline-field">
+                <input id="storageValue" type="text" value="webforge-test">
+                <button type="button" id="saveStorage">保存</button>
+            </div>
+        </div>
+        <div class="button-grid three">
+            <button type="button" class="secondary" id="readStorage">读取存储</button>
+            <button type="button" class="secondary" id="testIndexedDB">测试 IndexedDB</button>
+            <button type="button" class="secondary" id="clearStorage">清理存储</button>
+            <button type="button" class="secondary" id="testCookie">写入 Cookie</button>
+            <button type="button" class="secondary" id="testFetch">在线请求</button>
+            <button type="button" class="secondary" id="reloadPage">刷新页面</button>
+        </div>
+        <div class="result-box" id="storageResult">等待执行存储测试。</div>
+    </section>
+
+    <section class="section" id="nativeBridge">
+        <div class="section-head">
+            <div>
+                <h2>原生桥接</h2>
+                <p>验证 Toast、剪贴板、版本、网络、状态栏和页面控制。</p>
+            </div>
+            <span class="badge" id="bridgeBadge">检测中</span>
+        </div>
+        <div class="button-grid three">
+            <button type="button" data-native="toast">原生 Toast</button>
+            <button type="button" data-native="copy">复制文本</button>
+            <button type="button" data-native="version">读取版本</button>
+            <button type="button" data-native="network">读取网络</button>
+            <button type="button" class="secondary" data-native="light">浅色状态栏</button>
+            <button type="button" class="secondary" data-native="dark">深色状态栏</button>
+            <button type="button" class="secondary" data-native="reload">原生刷新</button>
+            <button type="button" class="secondary" data-native="history">历史返回</button>
+            <button type="button" class="danger" data-native="exit">关闭页面</button>
+        </div>
+        <div class="result-box" id="bridgeResult">等待调用原生接口。</div>
+    </section>
+
+    <section class="section" id="navigation">
+        <div class="section-head">
+            <div>
+                <h2>导航与系统 Intent</h2>
+                <p>这些操作会离开当前页面或打开其他应用。</p>
+            </div>
+            <span class="badge warn">谨慎触发</span>
+        </div>
+        <div class="field">
+            <label class="field-label" for="phoneNumber">电话号码</label>
+            <input id="phoneNumber" type="text" value="10086" inputmode="tel">
+        </div>
+        <div class="button-grid">
+            <button type="button" id="openTel">拨打电话</button>
+            <button type="button" id="openSms">发送短信</button>
+            <button type="button" class="secondary" id="openMail">发送邮件</button>
+            <button type="button" class="secondary" id="openGeo">地图 scheme</button>
+            <button type="button" class="blue" id="openBrowser">系统浏览器</button>
+            <button type="button" class="amber" id="openGaode">高德导航</button>
+        </div>
+        <p class="hint">
+            <a href="https://www.baidu.com" target="_blank" rel="noopener">target="_blank" 测试链接</a>
+            ·
+            <a href="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf">
+                下载 PDF
+            </a>
+        </p>
+    </section>
+
+    <section class="section" id="media">
+        <div class="section-head">
+            <div>
+                <h2>H5 视频与全屏</h2>
+                <p>验证 video 播放、控制器和全屏视频生命周期。</p>
+            </div>
+            <span class="badge" id="videoBadge">待播放</span>
+        </div>
+        <video class="media-preview" id="sampleVideo" controls playsinline preload="metadata">
+            <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+                    type="video/mp4">
+        </video>
+        <div class="button-grid">
+            <button type="button" id="playVideo">播放测试视频</button>
+            <button type="button" class="secondary" id="enterFullscreen">进入全屏</button>
+        </div>
+        <p class="hint">视频地址来自网络；离线时可优先使用上方的“选择视频/直接录像”。</p>
+    </section>
+
+    <section class="section" id="dialogs">
+        <div class="section-head">
+            <div>
+                <h2>JavaScript 弹窗</h2>
+                <p>验证 alert、confirm、prompt 在 WebChromeClient 中的表现。</p>
+            </div>
+        </div>
+        <div class="button-grid three">
+            <button type="button" id="testAlert">Alert</button>
+            <button type="button" class="secondary" id="testConfirm">Confirm</button>
+            <button type="button" class="secondary" id="testPrompt">Prompt</button>
+        </div>
+    </section>
+
+    <section class="section" id="remotePage">
+        <div class="section-head">
+            <div>
+                <h2>打开远程 H5</h2>
+                <p>当前测试页默认从本地 assets 加载，也可以继续进行线上页面验证。</p>
+            </div>
+        </div>
+        <div class="field">
+            <label class="field-label" for="remoteUrl">URL</label>
+            <input id="remoteUrl" type="url"
+                   value="https://testpservice.skabs.com.cn:10041/#">
+        </div>
+        <div class="button-grid">
+            <button type="button" id="openRemote">当前 WebView 打开</button>
+            <button type="button" class="secondary" id="openRemoteBrowser">系统浏览器打开</button>
+        </div>
+    </section>
+
+    <section class="section" id="logs">
+        <div class="section-head">
+            <div>
+                <h2>测试日志</h2>
+                <p>记录调用过程、权限结果和错误信息。</p>
+            </div>
+            <button type="button" class="secondary" id="clearLogs">清空</button>
+        </div>
+        <ul class="log" id="logList" aria-live="polite"></ul>
+    </section>
+
+    <footer class="footer">
+        WebForge H5 capability lab · Local asset test page
+    </footer>
+</main>
+
+<script>
+    (function () {
+        "use strict";
+
+        var mediaStream = null;
+        var mediaRecorder = null;
+        var recordingChunks = [];
+        var recordingStream = null;
+        var watchId = null;
+        var previewUrls = [];
+
+        function $(selector, root) {
+            return (root || document).querySelector(selector);
+        }
+
+        function $all(selector, root) {
+            return Array.prototype.slice.call((root || document).querySelectorAll(selector));
+        }
+
+        function bridge() {
+            return window.Android && typeof window.Android === "object" ? window.Android : null;
+        }
+
+        function setValue(id, text) {
+            var element = document.getElementById(id);
+            if (element) {
+                element.textContent = text;
+            }
+        }
+
+        function setBadge(id, text, style) {
+            var element = document.getElementById(id);
+            if (!element) {
+                return;
+            }
+            element.textContent = text;
+            element.className = "badge" + (style ? " " + style : "");
+        }
+
+        function log(message, level) {
+            var list = document.getElementById("logList");
+            if (!list) {
+                return;
+            }
+            var item = document.createElement("li");
+            var time = new Date().toLocaleTimeString("zh-CN", {hour12: false});
+            var timeSpan = document.createElement("span");
+            timeSpan.className = "log-time";
+            timeSpan.textContent = time;
+            item.appendChild(timeSpan);
+
+            var textSpan = document.createElement("span");
+            textSpan.className = level ? "log-" + level : "";
+            textSpan.textContent = message;
+            item.appendChild(textSpan);
+            list.appendChild(item);
+            list.scrollTop = list.scrollHeight;
+
+            while (list.children.length > 120) {
+                list.removeChild(list.firstChild);
+            }
+        }
+
+        function showError(context, error) {
+            var text = error && (error.message || error.toString());
+            log(context + "：" + text, "error");
+            return text;
+        }
+
+        function formatBytes(bytes) {
+            if (!isFinite(bytes) || bytes < 1) {
+                return "0 B";
+            }
+            var units = ["B", "KB", "MB", "GB"];
+            var index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+            return (bytes / Math.pow(1024, index)).toFixed(index === 0 ? 0 : 1) + " " + units[index];
+        }
+
+        function safeCall(name, args) {
+            var nativeBridge = bridge();
+            if (!nativeBridge || typeof nativeBridge[name] !== "function") {
+                log("原生接口不可用：" + name, "error");
+                return null;
+            }
+            try {
+                return nativeBridge[name].apply(nativeBridge, args || []);
+            } catch (error) {
+                showError(name, error);
+                return null;
+            }
+        }
+
+        function updateEnvironment() {
+            var nativeBridge = bridge();
+            setValue("metricBridge", nativeBridge ? "已注入" : "不可用");
+            setValue("metricNetwork",
+                nativeBridge && typeof nativeBridge.getNetworkType === "function"
+                    ? String(nativeBridge.getNetworkType())
+                    : (navigator.onLine ? "online" : "offline"));
+            setValue("metricStorage", storageAvailable() ? "可用" : "不可用");
+            setValue("metricMedia",
+                navigator.mediaDevices && navigator.mediaDevices.getUserMedia ? "完整" : "受限");
+            setBadge("bridgeBadge", nativeBridge ? "Android 已连接" : "浏览器环境",
+                nativeBridge ? "ok" : "warn");
+            setBadge("onlineBadge", navigator.onLine ? "Online" : "Offline",
+                navigator.onLine ? "ok" : "warn");
+        }
+
+        function storageAvailable() {
+            try {
+                var key = "__webforge_storage_test__";
+                localStorage.setItem(key, "1");
+                localStorage.removeItem(key);
+                return true;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        function runSelfCheck() {
+            updateEnvironment();
+            var bridgeAvailable = !!bridge();
+            var storage = storageAvailable();
+            var media = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+            var indexed = typeof indexedDB !== "undefined";
+            var worker = "serviceWorker" in navigator;
+            var nativeVersion = bridgeAvailable
+                ? safeCall("getWebForgeVersion")
+                : null;
+            var nativeNetwork = bridgeAvailable
+                ? safeCall("getNetworkType")
+                : null;
+
+            var lines = [
+                "<strong>User-Agent：</strong>" + escapeHtml(navigator.userAgent),
+                "<strong>页面地址：</strong>" + escapeHtml(location.href),
+                "<strong>原生桥可用：</strong>" + (bridgeAvailable ? "是" : "否"),
+                "<strong>WebForge 版本：</strong>" + escapeHtml(String(nativeVersion || "N/A")),
+                "<strong>原生网络类型：</strong>" + escapeHtml(String(nativeNetwork || "N/A")),
+                "<strong>在线状态：</strong>" + (navigator.onLine ? "online" : "offline"),
+                "<strong>localStorage：</strong>" + (storage ? "可用" : "不可用"),
+                "<strong>IndexedDB：</strong>" + (indexed ? "可用" : "不可用"),
+                "<strong>getUserMedia：</strong>" + (media ? "可用" : "不可用"),
+                "<strong>MediaRecorder：</strong>" + (window.MediaRecorder ? "可用" : "不可用"),
+                "<strong>Service Worker：</strong>" + (worker ? "声明可用" : "不可用")
+            ];
+            $("#environmentResult").innerHTML = lines.join("<br>");
+            setBadge("environmentBadge",
+                bridgeAvailable && storage ? "环境正常" : "存在限制",
+                bridgeAvailable && storage ? "ok" : "warn");
+            refreshPermissions();
+            log("基础自检完成：bridge=" + bridgeAvailable + ", storage=" + storage
+                + ", media=" + media, "ok");
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function refreshPermissions() {
+            $all(".permission-row").forEach(function (row) {
+                var button = $("button", row);
+                var type = button && button.getAttribute("data-permission");
+                if (!type || !bridge() || typeof bridge().hasPermission !== "function") {
+                    return;
+                }
+                try {
+                    var granted = !!bridge().hasPermission(type);
+                    button.textContent = granted ? "已授权" : "申请";
+                    button.className = granted ? "secondary" : "";
+                } catch (error) {
+                    button.textContent = "不可用";
+                    button.disabled = true;
+                }
+            });
+        }
+
+        window.onNativePermissionResult = function (granted) {
+            log("权限回调结果：" + (granted ? "已授权" : "未授权"),
+                granted ? "ok" : "warn");
+            refreshPermissions();
+        };
+
+        function requestPermission(type) {
+            if (!bridge()) {
+                log("非 Android WebView 环境，无法申请 " + type, "warn");
+                return;
+            }
+            log("申请权限：" + type);
+            safeCall("requestPermission", [type, "onNativePermissionResult"]);
+        }
+
+        function clearFilePreviews() {
+            previewUrls.forEach(function (url) {
+                URL.revokeObjectURL(url);
+            });
+            previewUrls = [];
+        }
+
+        function renderFiles(fileList, kind) {
+            var container = $("#fileResults");
+            container.innerHTML = "";
+            var files = Array.prototype.slice.call(fileList || []);
+            if (!files.length) {
+                setBadge("fileBadge", "未选择");
+                log("文件选择已取消：" + kind, "warn");
+                return;
+            }
+
+            setBadge("fileBadge", files.length + " 个文件", "ok");
+            files.forEach(function (file) {
+                var row = document.createElement("div");
+                row.className = "file-item";
+
+                var media = document.createElement("div");
+                media.className = "file-icon";
+                media.textContent = file.type.indexOf("image/") === 0 ? "IMG"
+                    : file.type.indexOf("video/") === 0 ? "VID"
+                    : file.type.indexOf("audio/") === 0 ? "AUD" : "FILE";
+
+                if (file.type.indexOf("image/") === 0) {
+                    var img = document.createElement("img");
+                    var imageUrl = URL.createObjectURL(file);
+                    previewUrls.push(imageUrl);
+                    img.src = imageUrl;
+                    img.alt = file.name;
+                    media = img;
+                }
+
+                var meta = document.createElement("div");
+                meta.className = "file-meta";
+                var name = document.createElement("div");
+                name.className = "file-name";
+                name.textContent = file.name;
+                var detail = document.createElement("div");
+                detail.className = "file-detail";
+                detail.textContent = formatBytes(file.size) + " · "
+                    + (file.type || "unknown") + " · "
+                    + new Date(file.lastModified).toLocaleString("zh-CN");
+                meta.appendChild(name);
+                meta.appendChild(detail);
+
+                row.appendChild(media);
+                row.appendChild(meta);
+                container.appendChild(row);
+                log("文件就绪：" + file.name + " (" + formatBytes(file.size) + ")", "ok");
+            });
+        }
+
+        function stopCamera() {
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(function (track) {
+                    track.stop();
+                });
+                mediaStream = null;
+            }
+            var preview = $("#cameraPreview");
+            if (preview) {
+                preview.srcObject = null;
+            }
+            setBadge("cameraBadge", "已停止", "warn");
+            log("摄像头资源已释放");
+        }
+
+        function startCamera() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                log("当前 WebView 不支持 getUserMedia", "error");
+                return;
+            }
+            stopCamera();
+            setBadge("cameraBadge", "正在打开", "warn");
+            navigator.mediaDevices.getUserMedia({
+                video: {facingMode: {ideal: "environment"}},
+                audio: false
+            }).then(function (stream) {
+                mediaStream = stream;
+                var video = $("#cameraPreview");
+                video.srcObject = stream;
+                video.play().catch(function (error) {
+                    showError("摄像头预览播放失败", error);
+                });
+                setBadge("cameraBadge", "运行中", "ok");
+                log("摄像头已启动：" + stream.getVideoTracks().map(function (track) {
+                    return track.label;
+                }).join(", "), "ok");
+            }).catch(function (error) {
+                setBadge("cameraBadge", "失败", "error");
+                showError("摄像头启动失败", error);
+            });
+        }
+
+        function startRecording() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                log("当前 WebView 不支持 getUserMedia", "error");
+                return;
+            }
+            if (!window.MediaRecorder) {
+                log("当前 WebView 不支持 MediaRecorder", "error");
+                return;
+            }
+            if (recordingStream) {
+                log("录音已在进行", "warn");
+                return;
+            }
+            navigator.mediaDevices.getUserMedia({audio: true, video: false})
+                .then(function (stream) {
+                    recordingStream = stream;
+                    recordingChunks = [];
+                    mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.ondataavailable = function (event) {
+                        if (event.data && event.data.size > 0) {
+                            recordingChunks.push(event.data);
+                        }
+                    };
+                    mediaRecorder.onstop = function () {
+                        var blob = new Blob(recordingChunks, {
+                            type: mediaRecorder.mimeType || "audio/webm"
+                        });
+                        var audio = $("#recordingPreview");
+                        audio.src = URL.createObjectURL(blob);
+                        setBadge("recordBadge",
+                            "已录制 " + formatBytes(blob.size), "ok");
+                        log("录音完成：" + formatBytes(blob.size), "ok");
+                        $("#startRecording").disabled = false;
+                        $("#stopRecording").disabled = true;
+                    };
+                    mediaRecorder.start();
+                    $("#startRecording").disabled = true;
+                    $("#stopRecording").disabled = false;
+                    setBadge("recordBadge", "录音中", "warn");
+                    log("麦克风录音已开始", "ok");
+                })
+                .catch(function (error) {
+                    setBadge("recordBadge", "失败", "error");
+                    showError("录音启动失败", error);
+                });
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== "inactive") {
+                mediaRecorder.stop();
+            }
+            if (recordingStream) {
+                recordingStream.getTracks().forEach(function (track) {
+                    track.stop();
+                });
+                recordingStream = null;
+            }
+        }
+
+        function getLocation() {
+            if (!navigator.geolocation) {
+                log("当前 WebView 不支持 Geolocation", "error");
+                return;
+            }
+            setBadge("locationBadge", "定位中", "warn");
+            navigator.geolocation.getCurrentPosition(function (position) {
+                var coords = position.coords;
+                $("#locationResult").innerHTML =
+                    "<strong>纬度：</strong>" + coords.latitude + "<br>" +
+                    "<strong>经度：</strong>" + coords.longitude + "<br>" +
+                    "<strong>精度：</strong>" + Math.round(coords.accuracy) + " 米<br>" +
+                    "<strong>时间：</strong>" + new Date(position.timestamp).toLocaleString("zh-CN");
+                setBadge("locationBadge", "成功", "ok");
+                log("定位成功：" + coords.latitude + ", " + coords.longitude, "ok");
+            }, function (error) {
+                setBadge("locationBadge", "失败", "error");
+                $("#locationResult").textContent = "定位失败：" + error.message;
+                log("定位失败：" + error.code + " " + error.message, "error");
+            }, {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 0
+            });
+        }
+
+        function toggleWatchLocation() {
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+                $("#watchLocation").textContent = "持续定位";
+                setBadge("locationBadge", "已停止", "warn");
+                log("已停止持续定位");
+                return;
+            }
+            if (!navigator.geolocation) {
+                log("当前 WebView 不支持 Geolocation", "error");
+                return;
+            }
+            $("#watchLocation").textContent = "停止定位";
+            setBadge("locationBadge", "持续定位", "ok");
+            watchId = navigator.geolocation.watchPosition(function (position) {
+                $("#locationResult").textContent =
+                    "lat=" + position.coords.latitude
+                    + ", lng=" + position.coords.longitude
+                    + ", accuracy=" + Math.round(position.coords.accuracy) + "m";
+                log("位置更新：" + position.coords.latitude + ", "
+                    + position.coords.longitude);
+            }, function (error) {
+                showError("持续定位失败", error);
+            }, {enableHighAccuracy: true, timeout: 15000});
+        }
+
+        function saveStorage() {
+            try {
+                var value = $("#storageValue").value;
+                localStorage.setItem("webforge_test_value", value);
+                sessionStorage.setItem("webforge_session_value", value);
+                $("#storageResult").textContent =
+                    "已写入 localStorage 和 sessionStorage：" + value;
+                log("存储写入成功：" + value, "ok");
+            } catch (error) {
+                showError("存储写入失败", error);
+            }
+        }
+
+        function readStorage() {
+            try {
+                var local = localStorage.getItem("webforge_test_value");
+                var session = sessionStorage.getItem("webforge_session_value");
+                $("#storageResult").textContent =
+                    "localStorage=" + String(local)
+                    + "\nsessionStorage=" + String(session);
+                log("存储读取完成", "ok");
+            } catch (error) {
+                showError("存储读取失败", error);
+            }
+        }
+
+        function clearStorage() {
+            try {
+                localStorage.removeItem("webforge_test_value");
+                sessionStorage.removeItem("webforge_session_value");
+                $("#storageResult").textContent = "测试存储已清理。";
+                log("测试存储已清理", "ok");
+            } catch (error) {
+                showError("存储清理失败", error);
+            }
+        }
+
+        function testCookie() {
+            var value = "webforge_" + Date.now();
+            document.cookie = "webforge_test=" + encodeURIComponent(value)
+                + "; path=/; max-age=3600; SameSite=Lax";
+            $("#storageResult").textContent =
+                "document.cookie=" + document.cookie;
+            log("Cookie 写入结果：" + document.cookie, "ok");
+        }
+
+        function testIndexedDB() {
+            if (typeof indexedDB === "undefined") {
+                log("当前 WebView 不支持 IndexedDB", "error");
+                return;
+            }
+            var request = indexedDB.open("webforge_h5_test", 1);
+            request.onupgradeneeded = function () {
+                var db = request.result;
+                if (!db.objectStoreNames.contains("records")) {
+                    db.createObjectStore("records", {keyPath: "id"});
+                }
+            };
+            request.onerror = function () {
+                showError("IndexedDB 打开失败", request.error);
+            };
+            request.onsuccess = function () {
+                var db = request.result;
+                var transaction = db.transaction("records", "readwrite");
+                transaction.objectStore("records").put({
+                    id: "last",
+                    time: Date.now(),
+                    page: location.href
+                });
+                transaction.oncomplete = function () {
+                    $("#storageResult").textContent =
+                        "IndexedDB 写入成功，数据库 webforge_h5_test / store records";
+                    log("IndexedDB 写入成功", "ok");
+                    db.close();
+                };
+                transaction.onerror = function () {
+                    showError("IndexedDB 写入失败", transaction.error);
+                };
+            };
+        }
+
+        function testFetch() {
+            if (!window.fetch) {
+                $("#storageResult").textContent = "当前 WebView 不支持 fetch。";
+                log("当前 WebView 不支持 fetch", "warn");
+                return;
+            }
+            var started = performance.now();
+            log("开始在线请求 https://www.baidu.com/favicon.ico");
+            fetch("https://www.baidu.com/favicon.ico", {
+                mode: "no-cors",
+                cache: "no-store"
+            }).then(function () {
+                var cost = Math.round(performance.now() - started);
+                $("#storageResult").textContent =
+                    "在线请求成功，耗时约 " + cost + "ms";
+                log("在线请求成功：" + cost + "ms", "ok");
+            }).catch(function (error) {
+                $("#storageResult").textContent =
+                    "在线请求失败：" + (error.message || error);
+                showError("在线请求失败", error);
+            });
+        }
+
+        function handleNativeAction(action) {
+            var result = document.getElementById("bridgeResult");
+            switch (action) {
+                case "toast":
+                    safeCall("toast", ["Frameweb H5 测试成功"]);
+                    result.textContent = "已调用 Android.toast";
+                    break;
+                case "copy":
+                    var text = "webforge clipboard " + new Date().toISOString();
+                    safeCall("copyText", [text]);
+                    result.textContent = "已复制：" + text;
+                    break;
+                case "version":
+                    result.textContent = "WebForge 版本："
+                        + String(safeCall("getWebForgeVersion"));
+                    break;
+                case "network":
+                    result.textContent = "网络类型："
+                        + String(safeCall("getNetworkType"));
+                    break;
+                case "light":
+                    safeCall("setStatusBarColor", ["FFFFFF", 2]);
+                    safeCall("setTransparentForWindow", [1]);
+                    result.textContent = "已设置浅色状态栏";
+                    break;
+                case "dark":
+                    safeCall("setStatusBarColor", ["0F172A", 1]);
+                    result.textContent = "已设置深色状态栏";
+                    break;
+                case "reload":
+                    safeCall("reload");
+                    result.textContent = "已调用原生刷新";
+                    break;
+                case "history":
+                    safeCall("finishPagebyHistory");
+                    result.textContent = "已调用历史返回";
+                    break;
+                case "exit":
+                    if (window.confirm("确认关闭当前 WebView 页面？")) {
+                        safeCall("exitWebview");
+                    }
+                    break;
+            }
+            log("原生操作：" + action);
+        }
+
+        function bindEvents() {
+            $("#runSelfCheck").addEventListener("click", runSelfCheck);
+            $all("[data-scroll]").forEach(function (button) {
+                button.addEventListener("click", function () {
+                    var target = $(button.getAttribute("data-scroll"));
+                    if (target) {
+                        target.scrollIntoView({behavior: "smooth", block: "start"});
+                    }
+                });
+            });
+
+            $("#refreshPermissions").addEventListener("click", refreshPermissions);
+            $all("[data-permission]").forEach(function (button) {
+                button.addEventListener("click", function () {
+                    requestPermission(button.getAttribute("data-permission"));
+                });
+            });
+
+            $all("[data-file-kind]").forEach(function (input) {
+                input.addEventListener("change", function () {
+                    clearFilePreviews();
+                    renderFiles(input.files, input.getAttribute("data-file-kind"));
+                    input.value = "";
+                });
+            });
+
+            $("#startCamera").addEventListener("click", startCamera);
+            $("#stopCamera").addEventListener("click", stopCamera);
+            $("#startRecording").addEventListener("click", startRecording);
+            $("#stopRecording").addEventListener("click", stopRecording);
+            $("#releaseRecording").addEventListener("click", function () {
+                stopRecording();
+                $("#recordingPreview").removeAttribute("src");
+                $("#recordingPreview").load();
+                setBadge("recordBadge", "已释放", "warn");
+                log("录音资源已释放");
+            });
+
+            $("#getLocation").addEventListener("click", getLocation);
+            $("#watchLocation").addEventListener("click", toggleWatchLocation);
+            $("#saveStorage").addEventListener("click", saveStorage);
+            $("#readStorage").addEventListener("click", readStorage);
+            $("#clearStorage").addEventListener("click", clearStorage);
+            $("#testCookie").addEventListener("click", testCookie);
+            $("#testIndexedDB").addEventListener("click", testIndexedDB);
+            $("#testFetch").addEventListener("click", testFetch);
+            $("#reloadPage").addEventListener("click", function () {
+                location.reload();
+            });
+
+            $all("[data-native]").forEach(function (button) {
+                button.addEventListener("click", function () {
+                    handleNativeAction(button.getAttribute("data-native"));
+                });
+            });
+
+            $("#openTel").addEventListener("click", function () {
+                var phone = $("#phoneNumber").value.trim();
+                if (phone) {
+                    log("打开 tel:" + phone);
+                    location.href = "tel:" + encodeURIComponent(phone);
+                }
+            });
+            $("#openSms").addEventListener("click", function () {
+                var phone = $("#phoneNumber").value.trim();
+                if (phone) {
+                    log("打开 sms:" + phone);
+                    location.href = "sms:" + encodeURIComponent(phone)
+                        + "?body=" + encodeURIComponent("Frameweb H5 测试短信");
+                }
+            });
+            $("#openMail").addEventListener("click", function () {
+                location.href = "mailto:test@example.com"
+                    + "?subject=" + encodeURIComponent("Frameweb H5 测试")
+                    + "&body=" + encodeURIComponent("来自 WebView H5 测试页");
+            });
+            $("#openGeo").addEventListener("click", function () {
+                location.href = "geo:31.2304,121.4737?q="
+                    + encodeURIComponent("上海市人民广场");
+            });
+            $("#openBrowser").addEventListener("click", function () {
+                safeCall("openBrowser", ["https://www.baidu.com"]);
+            });
+            $("#openGaode").addEventListener("click", function () {
+                safeCall("openGaode", [
+                    "121.4737", "31.2304", "人民广场",
+                    "121.4903", "31.2397", "外滩"
+                ]);
+            });
+
+            $("#playVideo").addEventListener("click", function () {
+                var video = $("#sampleVideo");
+                video.play().then(function () {
+                    setBadge("videoBadge", "播放中", "ok");
+                }).catch(function (error) {
+                    showError("视频播放失败", error);
+                });
+            });
+            $("#enterFullscreen").addEventListener("click", function () {
+                var video = $("#sampleVideo");
+                if (video.requestFullscreen) {
+                    video.requestFullscreen().then(function () {
+                        setBadge("videoBadge", "全屏", "ok");
+                    }).catch(function (error) {
+                        showError("进入全屏失败", error);
+                    });
+                } else if (video.webkitEnterFullscreen) {
+                    video.webkitEnterFullscreen();
+                    setBadge("videoBadge", "全屏", "ok");
+                } else {
+                    log("当前 WebView 不支持 video 全屏", "warn");
+                }
+            });
+
+            $("#testAlert").addEventListener("click", function () {
+                alert("Frameweb H5 Alert 测试");
+                log("Alert 已确认", "ok");
+            });
+            $("#testConfirm").addEventListener("click", function () {
+                var ok = confirm("请选择确定或取消");
+                log("Confirm 结果：" + ok, ok ? "ok" : "warn");
+            });
+            $("#testPrompt").addEventListener("click", function () {
+                var value = prompt("请输入测试文本", "hello webforge");
+                log("Prompt 结果：" + String(value));
+            });
+
+            $("#openRemote").addEventListener("click", function () {
+                var url = $("#remoteUrl").value.trim();
+                if (/^https?:\/\//i.test(url)) {
+                    location.href = url;
+                } else {
+                    log("请输入有效的 http/https URL", "warn");
+                }
+            });
+            $("#openRemoteBrowser").addEventListener("click", function () {
+                var url = $("#remoteUrl").value.trim();
+                safeCall("openBrowser", [url]);
+            });
+            $("#clearLogs").addEventListener("click", function () {
+                $("#logList").innerHTML = "";
+            });
+
+            window.addEventListener("online", function () {
+                updateEnvironment();
+                log("网络恢复在线", "ok");
+            });
+            window.addEventListener("offline", function () {
+                updateEnvironment();
+                log("网络已断开", "warn");
+            });
+            window.addEventListener("pagehide", function () {
+                stopCamera();
+                stopRecording();
+                if (watchId !== null) {
+                    navigator.geolocation.clearWatch(watchId);
+                    watchId = null;
+                }
+                clearFilePreviews();
+            });
+        }
+
+        function init() {
+            bindEvents();
+            updateEnvironment();
+            log("测试页已加载：" + location.href);
+            setTimeout(runSelfCheck, 250);
+        }
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", init);
+        } else {
+            init();
+        }
+    }());
+</script>
+</body>
+</html>
