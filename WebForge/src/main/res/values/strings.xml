@@ -1,4 +1,5 @@
 <resources>
+    <string name="webforge_prompt_hint">请输入内容</string>
     <string name="webforge_download_task_has_been_exist">The task already exists, do not repeat click to download!</string>
     <string name="webforge_tips">Note</string>
     <string name="webforge_honeycomblow">Wi-Fi disconnected. Continue the download via mobile data network?</string>

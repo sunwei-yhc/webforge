@@ -15,6 +15,7 @@ import android.webkit.PermissionRequest;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebView;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
@@ -100,7 +101,15 @@ public class PageUiController {
     }
 
     public void onJsAlert(WebView view, String url, String message) {
-        showMessage(view, message);
+        if (!canShowUi()) {
+            return;
+        }
+        AlertDialog dialog = newJsDialogBuilder()
+                .setTitle(R.string.webforge_tips)
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
+        styleJsDialog(dialog);
     }
 
     private void showMessage(WebView view, String message) {
@@ -141,12 +150,14 @@ public class PageUiController {
         if (confirm != null && confirm.isShowing()) {
             confirm.cancel();
         }
-        confirm = new AlertDialog.Builder(activity)
+        confirm = newJsDialogBuilder()
+                .setTitle(R.string.webforge_tips)
                 .setMessage(message)
                 .setNegativeButton(android.R.string.cancel, (dialog, which) -> result.cancel())
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> result.confirm())
                 .setOnCancelListener(dialog -> result.cancel())
                 .show();
+        styleJsDialog(confirm);
     }
 
     public void onJsPrompt(WebView view, String url, String message, String defaultValue,
@@ -160,7 +171,11 @@ public class PageUiController {
         }
         EditText input = new EditText(activity);
         input.setText(defaultValue);
-        prompt = new AlertDialog.Builder(activity)
+        input.setSingleLine(true);
+        input.setSelectAllOnFocus(true);
+        input.setHint(R.string.webforge_prompt_hint);
+        input.setPadding(dp(14), dp(10), dp(14), dp(10));
+        prompt = newJsDialogBuilder()
                 .setView(input)
                 .setTitle(message)
                 .setNegativeButton(android.R.string.cancel, (dialog, which) -> result.cancel())
@@ -168,6 +183,46 @@ public class PageUiController {
                         result.confirm(input.getText().toString()))
                 .setOnCancelListener(dialog -> result.cancel())
                 .show();
+        styleJsDialog(prompt);
+        input.requestFocus();
+    }
+
+    /** 创建统一的网页 JavaScript 弹框，避免直接使用宿主系统的老旧默认样式。 */
+    private AlertDialog.Builder newJsDialogBuilder() {
+        return new AlertDialog.Builder(activity, R.style.WebForgeJsDialog);
+    }
+
+    private void styleJsDialog(AlertDialog dialog) {
+        if (dialog == null || dialog.getWindow() == null) {
+            return;
+        }
+        dialog.getWindow().setDimAmount(0.42f);
+        TextView message = dialog.findViewById(android.R.id.message);
+        if (message != null) {
+            message.setTextColor(activity.getResources().getColor(R.color.webforge_dialog_text));
+            message.setTextSize(16);
+            message.setLineSpacing(0, 1.15f);
+        }
+        TextView title = dialog.findViewById(activity.getResources().getIdentifier(
+                "alertTitle", "id", "android"));
+        if (title != null) {
+            title.setTextColor(activity.getResources().getColor(R.color.webforge_dialog_title));
+            title.setTextSize(19);
+        }
+        TextView positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        TextView negative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        if (positive != null) {
+            positive.setTextColor(activity.getResources().getColor(R.color.webforge_dialog_accent));
+            positive.setTextSize(14);
+        }
+        if (negative != null) {
+            negative.setTextColor(activity.getResources().getColor(R.color.webforge_dialog_muted));
+            negative.setTextSize(14);
+        }
+    }
+
+    private int dp(int value) {
+        return Math.round(value * activity.getResources().getDisplayMetrics().density);
     }
 
     public void onSelectItemsPrompt(WebView view, String url, String[] options, Handler.Callback callback) {
