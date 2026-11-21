@@ -25,6 +25,14 @@ allprojects {
         mavenCentral()
         jcenter() // Warning: this repository is going to shut down soon
         maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/sunwei-yhc/webforge")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+        maven {
             url 'https://jitpack.io'
         }
         maven {

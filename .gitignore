@@ -12,3 +12,4 @@ local.properties
 *.keystore
 WebForge/build/
 build/
+.codegraph

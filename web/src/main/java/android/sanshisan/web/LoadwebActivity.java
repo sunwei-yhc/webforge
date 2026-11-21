@@ -35,7 +35,7 @@ public class LoadwebActivity extends BaseWebForgeActivity {
 
     @NonNull
     @Override
-    protected ViewGroup getWebForgeParent() {
+    public ViewGroup getWebForgeParent() {
         return findViewById(R.id.mFrameLayout);
     }
     @Override
@@ -47,7 +47,7 @@ public class LoadwebActivity extends BaseWebForgeActivity {
 
     @Nullable
     @Override
-    protected String getUrl() {
+    public String getUrl() {
         return "file:///android_asset/webview_h5_test.html";
     }
 

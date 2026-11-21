@@ -2,3 +2,8 @@
 -keepclassmembers class * {
     @android.webkit.JavascriptInterface <methods>;
 }
+
+# WebForge 的公开 API 由宿主直接继承或调用，不能在发布 AAR 中被 R8 重命名或移除。
+-keep public class io.github.sunwei.webforge.** {
+    *;
+}

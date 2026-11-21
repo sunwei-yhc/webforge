@@ -22,7 +22,7 @@ public class FragmentLoadweb extends BaseWebForgeFragment {
 
     @NonNull
     @Override
-    protected ViewGroup getWebForgeParent() {
+    public ViewGroup getWebForgeParent() {
         return requireView().findViewById(R.id.container);
     }
 
