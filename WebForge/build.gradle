@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'io.github.sunwei'
-version = '1.0.0'
+version = '0.1.0'
 
 android {
     namespace 'io.github.sunwei.webforge'
@@ -24,7 +24,9 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            // AAR 中的实现代码使用 R8 混淆和压缩；公开 API 由 consumer-rules.pro 保护。
+            minifyEnabled true
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -119,6 +121,8 @@ afterEvaluate {
 }
 
 signing {
+    // CI 或本地未配置签名密钥时仍可构建 AAR；发布到需要签名的仓库时再注入密钥。
+    required { project.findProperty('signing.keyId') != null }
     sign publishing.publications
 }
 
