@@ -7,9 +7,9 @@
 
 - 库名称、目录及 Gradle 模块：`WebForge` / `:WebForge`。
 - namespace 与基础包名：`io.github.sunwei.webforge`。
-- Maven 坐标：`io.github.sunwei:webforge:1.0.0`（发布配置，尚未上传）。
+- Maven 坐标：`io.github.sunwei:webforge:0.1.1`（发布配置）。
 - Release 产物：`WebForge/build/outputs/aar/WebForge-release.aar`。
-- 版本统一在 `build.gradle` 的 `project.version` 中维护，运行时返回 `WebForge/1.0.0`。
+- 版本统一在 `build.gradle` 的 `project.version` 中维护，运行时返回 `WebForge/0.1.1`。
 
 工程内使用：
 

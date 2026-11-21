@@ -13,4 +13,4 @@
 ```
 
 AAR 输出为 `WebForge/build/outputs/aar/WebForge-release.aar`。
-Maven 发布坐标配置为 `io.github.sunwei:webforge:1.0.0`。
+Maven 发布坐标配置为 `io.github.sunwei:webforge:0.1.1`。
