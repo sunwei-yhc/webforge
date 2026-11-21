@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#000000</color>
+    <color name="white">#ffffff</color>
+    <color name="select_color">#2e2e32</color>
+    <color name="colorPrimary">#393a3f</color>
+    <color name="webforge_chooser_surface">#FFFFFF</color>
+    <color name="webforge_chooser_ink">#172033</color>
+    <color name="webforge_chooser_muted">#64748B</color>
+    <color name="webforge_chooser_brand">#0F766E</color>
+    <color name="webforge_chooser_brand_soft">#E3F4F0</color>
+    <color name="webforge_chooser_brand_line">#80C9BE</color>
+    <color name="webforge_chooser_card">#F8FAFC</color>
+    <color name="webforge_chooser_card_pressed">#EDF7F5</color>
+    <color name="webforge_chooser_line">#E2E8F0</color>
+    <color name="webforge_chooser_drag">#CBD5E1</color>
+    <color name="webforge_chooser_chevron">#94A3B8</color>
+</resources>

@@ -1,0 +1,28 @@
+<resources>
+    <string name="webforge_download_task_has_been_exist">The task already exists, do not repeat click to download!</string>
+    <string name="webforge_tips">Note</string>
+    <string name="webforge_honeycomblow">Wi-Fi disconnected. Continue the download via mobile data network?</string>
+    <string name="webforge_download">Download</string>
+    <string name="webforge_cancel">Cancel</string>
+    <string name="webforge_camera">Camera</string>
+    <string name="webforge_file_chooser">Files</string>
+    <string name="webforge_loading">Loading ...</string>
+    <string name="webforge_leave_app_and_go_other_page">leaving %s and opening another app?</string>
+    <string name="webforge_leave">Go away</string>
+    <string name="webforge_max_file_length_limit">The selected file can not be larger than %s MB</string>
+    <string name="webforge_default_page_error">error~</string>
+    <string name="webforge_message_show_ssl_untrusted" translatable="false">The certificate authority is not trusted.</string>
+    <string name="webforge_message_show_ssl_expired">The certificate has expired.</string>
+    <string name="webforge_message_show_ssl_hostname_mismatch">The certificate Hostname mismatch.</string>
+    <string name="webforge_message_show_ssl_not_yet_valid">The certificate is not yet valid.</string>
+    <string name="webforge_message_show_ssl_error">SSL Certificate error.</string>
+    <string name="webforge_message_show_continue">Do you want to continue anyway?</string>
+    <string name="webforge_title_ssl_error">SSL Certificate Error</string>
+    <string name="webforge_continue">Continue</string>
+    <string name="webforge_chooser_title">Choose upload method</string>
+    <string name="webforge_chooser_subtitle">Take a new photo, or choose an existing file from this device.</string>
+    <string name="webforge_chooser_camera_desc">Take a photo or record a video</string>
+    <string name="webforge_chooser_file_desc">Photos, videos, audio and documents</string>
+    <string name="webforge_chooser_cancel">Cancel</string>
+    <string name="webforge_chooser_chevron" translatable="false">›</string>
+</resources>

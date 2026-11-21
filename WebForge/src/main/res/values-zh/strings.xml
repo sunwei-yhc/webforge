@@ -1,0 +1,26 @@
+<resources>
+    <string name="webforge_download_task_has_been_exist">该任务已经存在 ， 请勿重复点击下载!</string>
+    <string name="webforge_tips">提示</string>
+    <string name="webforge_honeycomblow">您正在使用手机流量 ， 继续下载该文件吗?</string>
+    <string name="webforge_download">下载</string>
+    <string name="webforge_cancel">取消</string>
+    <string name="webforge_camera">相机</string>
+    <string name="webforge_file_chooser">文件</string>
+    <string name="webforge_loading">加载中 ...</string>
+    <string name="webforge_leave_app_and_go_other_page">您需要离开%s前往其他应用吗？</string>
+    <string name="webforge_leave">离开</string>
+    <string name="webforge_max_file_length_limit">选择的文件不能大于%sMB</string>
+    <string name="webforge_default_page_error">出错啦! 点击空白处刷新 ~</string>
+    <string name="webforge_message_show_ssl_expired">证书已过期。</string>
+    <string name="webforge_message_show_ssl_hostname_mismatch">证书域名不匹配。</string>
+    <string name="webforge_message_show_ssl_not_yet_valid">证书尚未生效。</string>
+    <string name="webforge_message_show_ssl_error">SSL 证书错误。</string>
+    <string name="webforge_message_show_continue">是否仍要继续？</string>
+    <string name="webforge_title_ssl_error">SSL 证书错误</string>
+    <string name="webforge_continue">继续</string>
+    <string name="webforge_chooser_title">选择上传方式</string>
+    <string name="webforge_chooser_subtitle">拍摄一张新照片，或从手机中选择已有文件。</string>
+    <string name="webforge_chooser_camera_desc">拍照或录像，直接使用相机</string>
+    <string name="webforge_chooser_file_desc">照片、视频、音频和文档</string>
+    <string name="webforge_chooser_cancel">取消</string>
+</resources>

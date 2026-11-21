@@ -1,0 +1,125 @@
+plugins {
+    id 'com.android.library'
+    id 'maven-publish'
+    id 'signing'
+}
+
+group = 'io.github.sunwei'
+version = '1.0.0'
+
+android {
+    namespace 'io.github.sunwei.webforge'
+    compileSdkVersion 33
+    buildToolsVersion "33.0.1"
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 33
+        buildConfigField 'String', 'WEBFORGE_VERSION', '"' + project.version + '"'
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildFeatures {
+        buildConfig true
+    }
+    testOptions {
+        unitTests.includeAndroidResources = true
+    }
+    publishing {
+        singleVariant('release') {
+            withSourcesJar()
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core:1.6.0'
+    api 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'com.google.android.material:material:1.4.0'
+    api 'com.github.Justson:Downloader:v4.2.0-androidx'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.11.1'
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId = project.group.toString()
+                artifactId = 'webforge'
+                version = project.version.toString()
+                // 使用组件发布，自动生成依赖信息，宿主可直接解析完整依赖。
+                from components.release
+
+                pom {
+                    name = 'WebForge'
+                    description = 'WebForge Android WebView framework'
+                    url = 'https://github.com/sunwei/framemodule'
+                    licenses {
+                        license {
+                            name = 'MIT License'
+                            url = 'https://opensource.org/licenses/MIT'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'sunwei'
+                            name = 'Sun Wei'
+                            email = 'sunwei@example.com'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git@github.com:sunwei/framemodule.git'
+                        developerConnection = 'scm:git@github.com:sunwei/framemodule.git'
+                        url = 'https://github.com/sunwei/framemodule'
+                    }
+                }
+            }
+        }
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/sunwei/framemodule")
+                credentials {
+                    username = System.getenv("GITHUB_ACTOR")
+                    password = System.getenv("GITHUB_TOKEN")
+                }
+            }
+            maven {
+                name = "MavenCentral"
+                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                credentials {
+                    username = project.findProperty("OSSRH_USERNAME")
+                    password = project.findProperty("OSSRH_TOKEN")
+                }
+            }
+            maven {
+                name = "MavenCentralSnapshot"
+                url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+                credentials {
+                    username = project.findProperty("OSSRH_USERNAME")
+                    password = project.findProperty("OSSRH_TOKEN")
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications
+}
+
+apply from: rootProject.file('gradle/compile-parameters.gradle')
