@@ -10,6 +10,11 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
+import android.print.PrintAttributes;
+import android.print.PrintManager;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
@@ -182,6 +187,62 @@ public class AndroidBridge {
         }
     }
 
+    /** 前进到下一条历史，没有前进历史时不操作。 */
+    @JavascriptInterface
+    public void goForward() {
+        runOnUiThread(activity -> {
+            WebPage page = pageReference.get();
+            if (page != null && !page.isClosed() && page.getView().canGoForward()) {
+                page.getView().goForward();
+            }
+        });
+    }
+
+    /** 停止当前网页加载。 */
+    @JavascriptInterface
+    public void stopLoading() {
+        runOnUiThread(activity -> {
+            WebPage page = pageReference.get();
+            if (page != null && !page.isClosed()) {
+                page.stop();
+            }
+        });
+    }
+
+    /** 控制宿主窗口常亮；离开需要常亮的页面时应传入 false。 */
+    @JavascriptInterface
+    public void setKeepScreenOn(boolean enabled) {
+        runOnUiThread(activity -> {
+            if (enabled) {
+                activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            } else {
+                activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            }
+        });
+    }
+
+    /** 收起当前窗口的软键盘。 */
+    @JavascriptInterface
+    public void hideKeyboard() {
+        runOnUiThread(activity -> {
+            InputMethodManager manager = (InputMethodManager)
+                    activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (manager != null) {
+                manager.hideSoftInputFromWindow(activity.getWindow().getDecorView().getWindowToken(), 0);
+            }
+        });
+    }
+
+    /** 打开当前应用的系统设置，供用户手动调整权限等配置。 */
+    @JavascriptInterface
+    public void openAppSettings() {
+        Activity activity = activityReference.get();
+        if (isActivityActive(activity)) {
+            startExternalActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.fromParts("package", activity.getPackageName(), null)), "无法打开应用设置");
+        }
+    }
+
     /** 显示短时原生提示。 */
     @JavascriptInterface
     public void showToast(String message) {
@@ -216,6 +277,74 @@ public class AndroidBridge {
                 .setType("text/plain")
                 .putExtra(Intent.EXTRA_TEXT, text);
         startExternalActivity(Intent.createChooser(intent, null), "无法打开系统分享");
+    }
+
+    /** 分享当前 HTTP/HTTPS 网页的标题与地址，不暴露本地文件地址。 */
+    @JavascriptInterface
+    public void shareCurrentPage() {
+        runOnUiThread(activity -> {
+            WebPage page = pageReference.get();
+            if (page == null || page.isClosed()) {
+                return;
+            }
+            String url = page.getView().getUrl();
+            if (parseWebUri(url) == null) {
+                showToast("当前页面没有可分享的网页地址");
+                return;
+            }
+            String title = page.getView().getTitle();
+            shareText(TextUtils.isEmpty(title) ? url : title + "\n" + url);
+        });
+    }
+
+    /** 打开短信编辑器，由用户确认发送；号码只接受单个电话号码。 */
+    @JavascriptInterface
+    public void openSms(String number, String message) {
+        if (number == null || !number.trim().matches("[+]?[0-9][0-9 ()-]*")) {
+            showToast("请输入有效的电话号码");
+            return;
+        }
+        startExternalActivity(new Intent(Intent.ACTION_SENDTO,
+                Uri.fromParts("smsto", number.trim(), null))
+                .putExtra("sms_body", message == null ? "" : message), "无法打开短信应用");
+    }
+
+    /** 打开邮件编辑器，收件人、主题和正文均作为文本处理，由用户确认发送。 */
+    @JavascriptInterface
+    public void openEmail(String address, String subject, String body) {
+        if (address == null || !android.util.Patterns.EMAIL_ADDRESS.matcher(address.trim()).matches()) {
+            showToast("请输入有效的邮箱地址");
+            return;
+        }
+        Uri uri = Uri.parse("mailto:" + Uri.encode(address.trim())
+                + "?subject=" + Uri.encode(subject == null ? "" : subject)
+                + "&body=" + Uri.encode(body == null ? "" : body));
+        startExternalActivity(new Intent(Intent.ACTION_SENDTO, uri), "无法打开邮件应用");
+    }
+
+    /** 打开系统打印面板；API 19 起支持，须在网页加载完成后调用。 */
+    @JavascriptInterface
+    public void printPage() {
+        runOnUiThread(activity -> {
+            WebPage page = pageReference.get();
+            if (page == null || page.isClosed()) {
+                return;
+            }
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+                showToast("当前系统不支持网页打印");
+                return;
+            }
+            PrintManager manager = (PrintManager) activity.getSystemService(Context.PRINT_SERVICE);
+            if (manager == null) {
+                showToast("系统打印服务不可用");
+                return;
+            }
+            String title = page.getView().getTitle();
+            String jobName = TextUtils.isEmpty(title) ? "WebForge" : title;
+            manager.print(jobName, Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+                    ? page.getView().createPrintDocumentAdapter(jobName)
+                    : page.getView().createPrintDocumentAdapter(), new PrintAttributes.Builder().build());
+        });
     }
 
     /** 打开拨号器并预填号码，由用户确认拨打。 */

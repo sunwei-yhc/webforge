@@ -100,6 +100,37 @@ public class WebPageHostTest {
     }
 
     @Test
+    public void smsBridgeRejectsUriInputAndPrefillsMessage() {
+        ComponentActivity activity = Robolectric.buildActivity(ComponentActivity.class).setup().get();
+        AndroidBridge bridge = new AndroidBridge(null, activity);
+        bridge.openSms("10086?body=other", "正文");
+        assertNull(shadowOf(activity).getNextStartedActivity());
+        bridge.openSms(" +8610086 ", "内容 & 中文");
+        Intent intent = shadowOf(activity).getNextStartedActivity();
+        assertEquals(Intent.ACTION_SENDTO, intent.getAction());
+        assertEquals("smsto", intent.getData().getScheme());
+        assertEquals("+8610086", intent.getData().getSchemeSpecificPart());
+        assertEquals("内容 & 中文", intent.getStringExtra("sms_body"));
+    }
+
+    @Test
+    public void emailBridgeEncodesSubjectAndBodyWithoutInjectingRecipients() {
+        ComponentActivity activity = Robolectric.buildActivity(ComponentActivity.class).setup().get();
+        AndroidBridge bridge = new AndroidBridge(null, activity);
+        bridge.openEmail("user@example.com?bcc=other@example.com", "主题", "正文");
+        assertNull(shadowOf(activity).getNextStartedActivity());
+        bridge.openEmail("user@example.com", "主题 &bcc=other@example.com", "中文\n内容 #1");
+        Intent intent = shadowOf(activity).getNextStartedActivity();
+        assertEquals(Intent.ACTION_SENDTO, intent.getAction());
+        assertEquals("mailto", intent.getData().getScheme());
+        android.net.Uri query = android.net.Uri.parse("https://example.com/?"
+                + intent.getData().getEncodedSchemeSpecificPart().split("\\?", 2)[1]);
+        assertEquals("主题 &bcc=other@example.com", query.getQueryParameter("subject"));
+        assertEquals("中文\n内容 #1", query.getQueryParameter("body"));
+        assertNull(query.getQueryParameter("bcc"));
+    }
+
+    @Test
     public void shareBridgeOpensChooserWithPlainText() {
         ComponentActivity activity = Robolectric.buildActivity(ComponentActivity.class).setup().get();
         new AndroidBridge(null, activity).shareText("WebForge 分享");

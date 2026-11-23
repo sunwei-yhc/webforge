@@ -281,6 +281,11 @@ WebPage.builder(this, container)
 | 用途 | 推荐接口 |
 | --- | --- |
 | 页面控制 | `reloadPage()`、`goBackOrClose()`、`closePage()` |
+| 加载与历史 | `goForward()`、`stopLoading()` |
+| 窗口与输入 | `setKeepScreenOn(enabled)`、`hideKeyboard()` |
+| 应用设置 | `openAppSettings()` |
+| 短信和邮件 | `openSms(number, message)`、`openEmail(address, subject, body)` |
+| 网页分享和打印 | `shareCurrentPage()`、`printPage()` |
 | 提示、复制和分享 | `showToast(message)`、`copyToClipboard(text)`、`shareText(text)` |
 | 打开系统应用 | `openExternalBrowser(url)`、`openAmapRoute(startLongitude, startLatitude, startName, endLongitude, endLatitude, endName)`、`openDialer(number)` |
 | 版本和网络 | `getAppVersionName()`、`getWebForgeVersion()`、`getNetworkType()` |
@@ -290,6 +295,8 @@ WebPage.builder(this, container)
 `openDialer(number)` 预填号码，由用户在系统拨号器中确认拨打。`shareText(text)` 打开系统分享面板。`getAppVersionName()` 返回宿主应用的 `versionName`，读取失败时返回空字符串。权限回调接收布尔值，类型支持 `Camera`、`Audio`、`Call`、`Location` 和 `Media`，可用逗号分隔多个类型。
 
 旧 H5 仍可用 `reload()`、`finishPagebyHistory()`、`exitWebview()`、`toast(message)`、`copyText(text)`、`openBrowser(url)`、`openGaode(...)`、`setTransparentForWindow(value)` 和 `requestPermission(type[, callbackName])`。
+
+`openSms` 和 `openEmail` 仅预填单个收件人和内容，由用户确认发送，无需短信发送权限。`shareCurrentPage()` 仅分享 HTTP/HTTPS 地址，本地资源页面不会分享。`printPage()` 在 Android 4.4（API 19）起打开系统打印面板，请在页面加载完成后调用，可使用系统提供的另存为 PDF。`setKeepScreenOn` 作用于宿主窗口，离开需要常亮的页面时调用 `setKeepScreenOn(false)`。
 
 - `window.webForge.uploadFile(acceptType)` 打开选择器，通过全局函数 `uploadFileResult(files)` 返回结果。文件对象包含 `mId`、`contentPath` 和 `fileBase64`。取消或选择失败时返回 `null`。需要直接上传文件时优先使用标准文件表单，避免把整个文件转成 Base64。
 
