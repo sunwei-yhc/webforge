@@ -106,7 +106,18 @@ public class ToolbarWebFragment extends BrowserFragment {
             }
         });
         view.findViewById(R.id.iv_finish).setOnClickListener(v -> requireActivity().finish());
-        view.findViewById(R.id.iv_more).setOnClickListener(this::showMenu);
+        View menuAnchor = view.findViewById(R.id.iv_more);
+        menuAnchor.setOnClickListener(this::showMenu);
+        menuAnchor.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View view) {}
+
+            @Override
+            public void onViewDetachedFromWindow(View view) {
+                // 此时锚点仍能访问原窗口的 ViewTreeObserver，PopupWindow 可移除滚动监听。
+                dismissMenu();
+            }
+        });
     }
 
     private void showMenu(View anchor) {
@@ -161,13 +172,18 @@ public class ToolbarWebFragment extends BrowserFragment {
 
     @Override
     public void onDestroyView() {
-        if (popupMenu != null) {
-            popupMenu.dismiss();
-            popupMenu = null;
-        }
+        dismissMenu();
         super.onDestroyView();
         backView = null;
         lineView = null;
         titleView = null;
+    }
+
+    private void dismissMenu() {
+        PopupMenu menu = popupMenu;
+        popupMenu = null;
+        if (menu != null) {
+            menu.dismiss();
+        }
     }
 }

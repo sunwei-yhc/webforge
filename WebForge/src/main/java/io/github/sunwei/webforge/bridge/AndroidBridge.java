@@ -1,17 +1,23 @@
 package io.github.sunwei.webforge.bridge;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Bundle;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.widget.Toast;
+
+import androidx.core.util.Consumer;
+
+import java.lang.ref.WeakReference;
 
 import io.github.sunwei.webforge.WebPage;
 import io.github.sunwei.webforge.config.WebForgeConfig;
@@ -20,197 +26,85 @@ import io.github.sunwei.webforge.util.MapUtil;
 import io.github.sunwei.webforge.util.StatusBarUtil;
 import io.github.sunwei.webforge.util.WebForgeUtils;
 
-import java.lang.ref.WeakReference;
-
-/**
- * @Author 萤火虫
- * @Date 2021/7/23
- * @Desc
- */
+/** 供可信 H5 调用的 Android 原生能力。 */
 public class AndroidBridge {
     private static final String TAG = "AndroidBridge";
     private final WeakReference<WebPage> pageReference;
-    private final WeakReference<Activity> activityWeakReference;
+    private final WeakReference<Activity> activityReference;
 
     public AndroidBridge(WebPage page, Activity activity) {
         this.pageReference = new WeakReference<>(page);
-        this.activityWeakReference = new WeakReference<>(activity);
+        this.activityReference = new WeakReference<>(activity);
     }
 
-    /**
-     * 退出整个Webview页面
-     */
+    /** 关闭承载 WebView 的 Activity。 */
     @JavascriptInterface
-    public void exitWebview() {
-        final Activity activity = activityWeakReference.get();
-        if (activity == null || activity.isFinishing()) {
-            return;
-        }
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (!activity.isFinishing()) {
-                    activity.finish();
-                }
+    public void closePage() {
+        runOnUiThread(Activity::finish);
+    }
+
+    /** 先退出视频全屏或返回上一页，已无历史时关闭 Activity。 */
+    @JavascriptInterface
+    public void goBackOrClose() {
+        runOnUiThread(activity -> {
+            WebPage page = pageReference.get();
+            if (page != null && !page.isClosed() && !page.goBack()) {
+                activity.finish();
             }
         });
     }
 
-    /**
-     * 根据webview的历史层级进行返回
-     */
+    /** 用系统处理程序打开 HTTP 或 HTTPS 地址。 */
     @JavascriptInterface
-    public void finishPagebyHistory() {
-        Log.d(TAG, "finishPagebyHistory: ");
-        final Activity activity = activityWeakReference.get();
-        final WebPage page = pageReference.get();
-        if (activity == null || activity.isFinishing()) {
-            return;
-        }
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (page != null && !page.isClosed() && !page.goBack()) {
-                    if (!activity.isFinishing()) {
-                        activity.finish();
-                    }
-                }
-            }
-        });
-    }
-
-    /**
-     * 通过浏览器打开地址
-     * 可以通过浏览器下载资源文件
-     *
-     * @param url 打开的地址
-     */
-    @JavascriptInterface
-    public void openBrowser(String url) {
-        Log.d(TAG, "openBrowser: " + url);
-        final Activity activity = activityWeakReference.get();
-        if (activity == null || activity.isFinishing()) {
-            return;
-        }
-        final Uri uri = parseWebUri(url);
+    public void openExternalBrowser(String url) {
+        Uri uri = parseWebUri(url);
         if (uri == null) {
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(activity.getApplicationContext(),
-                            url + " 该链接无法使用浏览器打开。", Toast.LENGTH_SHORT).show();
-                }
-            });
+            showToast("请输入有效的 HTTP 或 HTTPS 地址");
             return;
         }
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    final Intent intent = new Intent();
-                    intent.setAction(Intent.ACTION_VIEW);
-                    intent.setData(uri);
-                    activity.startActivity(intent);
-                } catch (Exception e) {
-                    Log.d(TAG, "openBrowser: " + e.getMessage());
-                    Toast.makeText(activity.getApplicationContext(),
-                            "无法打开浏览器", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+        startExternalActivity(new Intent(Intent.ACTION_VIEW, uri), "无法打开浏览器");
+    }
+
+    /** 按经度、纬度、地点名的顺序传入起点和终点，打开高德驾车导航。 */
+    @JavascriptInterface
+    public void openAmapRoute(String startLongitude, String startLatitude, String startName,
+                              String endLongitude, String endLatitude, String endName) {
+        if (TextUtils.isEmpty(startLongitude) || TextUtils.isEmpty(startLatitude)
+                || TextUtils.isEmpty(endLongitude) || TextUtils.isEmpty(endLatitude)) {
+            return;
+        }
+        runOnUiThread(activity -> MapUtil.route(activity, startLongitude, startLatitude,
+                startName, endLongitude, endLatitude, endName));
     }
 
     /**
-     * 打开高德导航
-     *
-     * @param slon  起始点-经度
-     * @param slat  起始点-维度
-     * @param sName 起始点-地址名
-     * @param dlon  终点-经度
-     * @param dlat  终点-维度
-     * @param dName 终点-地址名字
+     * 设置状态栏颜色，支持 RRGGBB 或 AARRGGBB，可带 # 前缀。
+     * whiteIcons 为 1 时使用白色图标，其余值使用深色图标。
      */
     @JavascriptInterface
-    public void openGaode(String slon, String slat, String sName, String dlon, String dlat, String dName) {
-        final Activity activity = activityWeakReference.get();
-        if (activity == null || activity.isFinishing()
-                || TextUtils.isEmpty(slon) || TextUtils.isEmpty(slat)
-                || TextUtils.isEmpty(dlon) || TextUtils.isEmpty(dlat)) {
+    public void setStatusBarColor(String color, int whiteIcons) {
+        if (TextUtils.isEmpty(color) || !color.matches("(?i)#?[0-9a-f]{6}([0-9a-f]{2})?")) {
             return;
         }
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                MapUtil.route(activity, slon, slat, sName, dlon, dlat, dName);
+        int parsedColor = Color.parseColor(color.startsWith("#") ? color : "#" + color);
+        runOnUiThread(activity -> {
+            if (whiteIcons == 1) {
+                StatusBarUtil.setLightMode(activity);
+            } else {
+                StatusBarUtil.setDarkMode(activity);
             }
+            StatusBarUtil.setColor(activity, parsedColor);
         });
     }
 
-
-//    /**
-//     *
-//     */
-//    @JavascriptInterface
-//    public void setLightMode() {
-//        StatusBarUtil.setLightMode(activityWeakReference.get());
-//    }
-//
-//    @JavascriptInterface
-//    public void setDarkMode() {
-//        StatusBarUtil.setDarkMode(activityWeakReference.get());
-//    }
-
-    /**
-     * 设置WebView沉浸式状态栏的颜色
-     *
-     * @param color   例如 FFFFFF  不需要传#号
-     * @param isWhite 沉浸式状态栏字体颜色是否是  1 白色 2/0 黑色
-     */
-    @JavascriptInterface
-    public void setStatusBarColor(String color, int isWhite) {
-        final Activity activity = activityWeakReference.get();
-        if (activity == null || activity.isFinishing()
-                || TextUtils.isEmpty(color) || !color.matches("(?i)^[0-9a-f]{6}([0-9a-f]{2})?$")) {
-            return;
-        }
-        final int parsedColor;
-        try {
-            parsedColor = Color.parseColor("#" + color);
-        } catch (IllegalArgumentException ignored) {
-            return;
-        }
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (isWhite == 1) {
-                    StatusBarUtil.setLightMode(activity);
-                } else {
-                    StatusBarUtil.setDarkMode(activity);
-                }
-                StatusBarUtil.setColor(activity, parsedColor);
-            }
-        });
-    }
-
-    /**
-     * 是否显示原生沉浸式状态栏
-     *
-     * @param isShowWindow 1 显示沉浸式状态栏  0 不显示沉浸式状态栏
-     */
+    /** 1 清除透明状态栏，其他值启用透明状态栏。 */
     @JavascriptInterface
     public void setTransparentForWindow(int isShowWindow) {
-        final Activity activity = activityWeakReference.get();
-        if (activity == null || activity.isFinishing()) {
-            return;
-        }
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (isShowWindow == 1) {
-                    StatusBarUtil.clearFlag(activity);
-                } else {
-                    StatusBarUtil.setTransparentForWindow(activity);
-                }
+        runOnUiThread(activity -> {
+            if (isShowWindow == 1) {
+                StatusBarUtil.clearFlag(activity);
+            } else {
+                StatusBarUtil.setTransparentForWindow(activity);
             }
         });
     }
@@ -222,7 +116,7 @@ public class AndroidBridge {
      */
     @JavascriptInterface
     public boolean hasPermission(String type) {
-        final Activity activity = activityWeakReference.get();
+        final Activity activity = activityReference.get();
         final String[] permissions = WebForgePermissions.of(type);
         if (activity == null || permissions.length == 0) {
             return false;
@@ -241,47 +135,29 @@ public class AndroidBridge {
         requestPermission(type, null);
     }
 
-    /**
-     * Requests permissions and invokes window.&lt;callbackName&gt;(granted).
-     *
-     * @param type         Camera | Audio | Call | Location | Media
-     * @param callbackName optional global JavaScript function name
-     */
+    /** 申请权限，结果通过指定的 JavaScript 函数返回布尔值。 */
     @JavascriptInterface
-    public void requestPermission(String type, final String callbackName) {
-        final Activity activity = activityWeakReference.get();
-        final String[] permissions = WebForgePermissions.of(type);
-        Log.d(TAG, "requestPermission type:" + type + " permissions:" + TextUtils.join(",", permissions));
-        if (activity == null || permissions.length == 0) {
+    public void requestPermissionsWithCallback(String type, String callbackName) {
+        String[] permissions = WebForgePermissions.of(type);
+        if (!isActivityActive(activityReference.get()) || permissions.length == 0) {
             invokePermissionCallback(callbackName, false);
             return;
         }
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (activity.isFinishing()) {
-                    return;
-                }
-                boolean requesting = WebForgeUtils.requestPermissions(
-                        activity,
-                        permissions,
-                        callbackName == null ? null
-                                : new io.github.sunwei.webforge.permission.WebForgeActionFragment.PermissionListener() {
-                                    @Override
-                                    public void onRequestPermissionsResult(
-                                            @androidx.annotation.NonNull String[] resultPermissions,
-                                            @androidx.annotation.NonNull int[] grantResults,
-                                            @androidx.annotation.NonNull Bundle extras) {
-                                        invokePermissionCallback(callbackName,
-                                                WebForgeUtils.hasPermission(activity, permissions));
-                                    }
-                                });
-                if (!requesting && callbackName != null) {
-                    invokePermissionCallback(callbackName,
-                            WebForgeUtils.hasPermission(activity, permissions));
-                }
+        runOnUiThread(activity -> {
+            boolean requesting = WebForgeUtils.requestPermissions(activity, permissions,
+                    callbackName == null ? null : (resultPermissions, grantResults, extras) ->
+                            invokePermissionCallback(callbackName,
+                                    WebForgeUtils.hasPermission(activity, permissions)));
+            if (!requesting && callbackName != null) {
+                invokePermissionCallback(callbackName,
+                        WebForgeUtils.hasPermission(activity, permissions));
             }
         });
+    }
+
+    @JavascriptInterface
+    public void requestPermission(String type, String callbackName) {
+        requestPermissionsWithCallback(type, callbackName);
     }
 
     private void invokePermissionCallback(final String callbackName, final boolean granted) {
@@ -297,56 +173,119 @@ public class AndroidBridge {
         page.callJavaScript(callbackName, granted);
     }
 
-    /**
-     * Reloads the current H5 page.
-     */
+    /** 刷新当前网页。 */
     @JavascriptInterface
-    public void reload() {
-        final WebPage page = pageReference.get();
-        final Activity activity = activityWeakReference.get();
-        if (page == null || activity == null || activity.isFinishing()) {
-            return;
+    public void reloadPage() {
+        WebPage page = pageReference.get();
+        if (page != null && isActivityActive(activityReference.get())) {
+            page.reload();
         }
-        page.reload();
     }
 
-    /**
-     * Shows a short native toast.
-     */
+    /** 显示短时原生提示。 */
     @JavascriptInterface
-    public void toast(final String message) {
-        final Activity activity = activityWeakReference.get();
-        if (activity == null || TextUtils.isEmpty(message)) {
-            return;
+    public void showToast(String message) {
+        if (!TextUtils.isEmpty(message)) {
+            runOnUiThread(activity -> Toast.makeText(activity.getApplicationContext(),
+                    message, Toast.LENGTH_SHORT).show());
         }
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(activity.getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
-    /**
-     * Copies plain text to the system clipboard.
-     */
+    /** 将纯文本写入系统剪贴板。 */
     @JavascriptInterface
-    public void copyText(String text) {
-        final Activity activity = activityWeakReference.get();
-        if (activity == null || TextUtils.isEmpty(text)) {
+    public void copyToClipboard(String text) {
+        if (TextUtils.isEmpty(text)) {
             return;
         }
-        final ClipboardManager clipboard =
-                (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
-        if (clipboard == null) {
-            return;
-        }
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
+        runOnUiThread(activity -> {
+            ClipboardManager clipboard =
+                    (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
+            if (clipboard != null) {
                 clipboard.setPrimaryClip(ClipData.newPlainText("webview", text));
             }
         });
+    }
+
+    /** 打开系统分享面板，分享纯文本。 */
+    @JavascriptInterface
+    public void shareText(String text) {
+        if (text == null || text.trim().isEmpty()) {
+            return;
+        }
+        Intent intent = new Intent(Intent.ACTION_SEND)
+                .setType("text/plain")
+                .putExtra(Intent.EXTRA_TEXT, text);
+        startExternalActivity(Intent.createChooser(intent, null), "无法打开系统分享");
+    }
+
+    /** 打开拨号器并预填号码，由用户确认拨打。 */
+    @JavascriptInterface
+    public void openDialer(String number) {
+        if (number == null || !number.trim().matches("[+]?[0-9][0-9 ()-]*")) {
+            showToast("请输入有效的电话号码");
+            return;
+        }
+        Uri uri = Uri.fromParts("tel", number.trim(), null);
+        startExternalActivity(new Intent(Intent.ACTION_DIAL, uri), "无法打开拨号器");
+    }
+
+    /** 读取宿主应用的 versionName，读取失败时返回空字符串。 */
+    @JavascriptInterface
+    public String getAppVersionName() {
+        Activity activity = activityReference.get();
+        if (activity == null) {
+            return "";
+        }
+        try {
+            String versionName = activity.getPackageManager()
+                    .getPackageInfo(activity.getPackageName(), 0).versionName;
+            return versionName == null ? "" : versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            return "";
+        }
+    }
+
+    @Deprecated
+    @JavascriptInterface
+    public void exitWebview() {
+        closePage();
+    }
+
+    @Deprecated
+    @JavascriptInterface
+    public void finishPagebyHistory() {
+        goBackOrClose();
+    }
+
+    @Deprecated
+    @JavascriptInterface
+    public void openBrowser(String url) {
+        openExternalBrowser(url);
+    }
+
+    @Deprecated
+    @JavascriptInterface
+    public void openGaode(String slon, String slat, String sName,
+                          String dlon, String dlat, String dName) {
+        openAmapRoute(slon, slat, sName, dlon, dlat, dName);
+    }
+
+    @Deprecated
+    @JavascriptInterface
+    public void reload() {
+        reloadPage();
+    }
+
+    @Deprecated
+    @JavascriptInterface
+    public void toast(String message) {
+        showToast(message);
+    }
+
+    @Deprecated
+    @JavascriptInterface
+    public void copyText(String text) {
+        copyToClipboard(text);
     }
 
     /**
@@ -354,7 +293,7 @@ public class AndroidBridge {
      */
     @JavascriptInterface
     public String getNetworkType() {
-        final Activity activity = activityWeakReference.get();
+        final Activity activity = activityReference.get();
         if (activity == null) {
             return "none";
         }
@@ -375,6 +314,35 @@ public class AndroidBridge {
     @JavascriptInterface
     public String getWebForgeVersion() {
         return WebForgeConfig.WEBFORGE_VERSION;
+    }
+
+    private void startExternalActivity(Intent intent, String failureMessage) {
+        runOnUiThread(activity -> {
+            try {
+                activity.startActivity(intent);
+            } catch (ActivityNotFoundException | SecurityException e) {
+                Log.w(TAG, failureMessage, e);
+                Toast.makeText(activity.getApplicationContext(),
+                        failureMessage, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void runOnUiThread(Consumer<Activity> action) {
+        Activity activity = activityReference.get();
+        if (isActivityActive(activity)) {
+            activity.runOnUiThread(() -> {
+                if (isActivityActive(activity)) {
+                    action.accept(activity);
+                }
+            });
+        }
+    }
+
+    private static boolean isActivityActive(Activity activity) {
+        return activity != null && !activity.isFinishing()
+                && (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1
+                || !activity.isDestroyed());
     }
 
     private static Uri parseWebUri(String url) {

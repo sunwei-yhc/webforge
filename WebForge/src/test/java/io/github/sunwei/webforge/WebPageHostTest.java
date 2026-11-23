@@ -1,5 +1,7 @@
 package io.github.sunwei.webforge;
 
+import android.Manifest;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -80,6 +82,45 @@ public class WebPageHostTest {
                 .webView(view).enableBuiltInBridges().open(URL);
         assertEquals(URL, view.urls.get(0));
         page.close();
+    }
+
+    @Test
+    public void dialerBridgePrefillsNumberAndRejectsNonPhoneInput() {
+        ComponentActivity activity = Robolectric.buildActivity(ComponentActivity.class).setup().get();
+        AndroidBridge bridge = new AndroidBridge(null, activity);
+
+        bridge.openDialer("tel:10086");
+        assertNull(shadowOf(activity).getNextStartedActivity());
+
+        bridge.openDialer(" +8610086 ");
+        Intent intent = shadowOf(activity).getNextStartedActivity();
+        assertEquals(Intent.ACTION_DIAL, intent.getAction());
+        assertEquals("tel", intent.getData().getScheme());
+        assertEquals("+8610086", intent.getData().getSchemeSpecificPart());
+    }
+
+    @Test
+    public void shareBridgeOpensChooserWithPlainText() {
+        ComponentActivity activity = Robolectric.buildActivity(ComponentActivity.class).setup().get();
+        new AndroidBridge(null, activity).shareText("WebForge 分享");
+
+        Intent chooser = shadowOf(activity).getNextStartedActivity();
+        assertEquals(Intent.ACTION_CHOOSER, chooser.getAction());
+        Intent share = chooser.getParcelableExtra(Intent.EXTRA_INTENT);
+        assertEquals(Intent.ACTION_SEND, share.getAction());
+        assertEquals("text/plain", share.getType());
+        assertEquals("WebForge 分享", share.getStringExtra(Intent.EXTRA_TEXT));
+    }
+
+    @Test
+    @Config(sdk = 29)
+    public void mediaPermissionRequiresOnlyReadStorageOnAndroid10() {
+        ComponentActivity activity = Robolectric.buildActivity(ComponentActivity.class).setup().get();
+        AndroidBridge bridge = new AndroidBridge(null, activity);
+
+        assertFalse(bridge.hasPermission("media"));
+        shadowOf(activity.getApplication()).grantPermissions(Manifest.permission.READ_EXTERNAL_STORAGE);
+        assertTrue(bridge.hasPermission("media"));
     }
 
     @Test

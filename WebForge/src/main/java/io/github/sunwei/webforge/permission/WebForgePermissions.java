@@ -45,9 +45,11 @@ public class WebForgePermissions {
 				Manifest.permission.CALL_PHONE};
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-			// Android 13 file uploads use the Storage Access Framework or the
-			// photo picker, neither of which needs a broad media permission.
+			// Android 13 起由系统文件选择器授予所选文件的访问权限。
 			MEDIA = new String[]{};
+		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+			// 与 Manifest 保持一致，写入权限只声明到 API 28。
+			MEDIA = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
 		} else {
 			MEDIA = new String[]{
 					Manifest.permission.READ_EXTERNAL_STORAGE,

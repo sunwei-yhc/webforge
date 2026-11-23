@@ -14,8 +14,9 @@ public class LoadwebActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loadmain);
 
-        WebPage.builder(this, findViewById(R.id.mFrameLayout))
+        WebPage mWebPage=   WebPage.builder(this, findViewById(R.id.mFrameLayout))
                 .enableBuiltInBridges()
                 .open("file:///android_asset/webview_h5_test.html");
+
     }
 }

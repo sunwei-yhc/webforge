@@ -276,7 +276,21 @@ WebPage.builder(this, container)
         .open("file:///android_asset/index.html");
 ```
 
-- `window.Android` 保留 `getWebForgeVersion()`、`getNetworkType()`、`reload()`、`toast(message)`、`copyText(text)`、`openBrowser(url)`、`exitWebview()`、`finishPagebyHistory()` 等方法。权限查询用 `hasPermission(type)`，权限请求用 `requestPermission(type, callbackName)`。H5 的回调接收布尔值，支持的类型包括 `Camera`、`Audio`、`Call`、`Location` 和 `Media`。
+内置的 `window.Android` 提供以下接口。
+
+| 用途 | 推荐接口 |
+| --- | --- |
+| 页面控制 | `reloadPage()`、`goBackOrClose()`、`closePage()` |
+| 提示、复制和分享 | `showToast(message)`、`copyToClipboard(text)`、`shareText(text)` |
+| 打开系统应用 | `openExternalBrowser(url)`、`openAmapRoute(startLongitude, startLatitude, startName, endLongitude, endLatitude, endName)`、`openDialer(number)` |
+| 版本和网络 | `getAppVersionName()`、`getWebForgeVersion()`、`getNetworkType()` |
+| 状态栏 | `setStatusBarColor(color, whiteIcons)`，例如 `setStatusBarColor("#FFFFFF", 0)` |
+| 权限 | `hasPermission(type)`、`requestPermissionsWithCallback(type, callbackName)` |
+
+`openDialer(number)` 预填号码，由用户在系统拨号器中确认拨打。`shareText(text)` 打开系统分享面板。`getAppVersionName()` 返回宿主应用的 `versionName`，读取失败时返回空字符串。权限回调接收布尔值，类型支持 `Camera`、`Audio`、`Call`、`Location` 和 `Media`，可用逗号分隔多个类型。
+
+旧 H5 仍可用 `reload()`、`finishPagebyHistory()`、`exitWebview()`、`toast(message)`、`copyText(text)`、`openBrowser(url)`、`openGaode(...)`、`setTransparentForWindow(value)` 和 `requestPermission(type[, callbackName])`。
+
 - `window.webForge.uploadFile(acceptType)` 打开选择器，通过全局函数 `uploadFileResult(files)` 返回结果。文件对象包含 `mId`、`contentPath` 和 `fileBase64`。取消或选择失败时返回 `null`。需要直接上传文件时优先使用标准文件表单，避免把整个文件转成 Base64。
 
 ```javascript

@@ -758,14 +758,16 @@
         <div class="section-head">
             <div>
                 <h2>原生桥接</h2>
-                <p>验证 Toast、剪贴板、版本、网络、状态栏和页面控制。</p>
+                <p>验证 Toast、剪贴板、系统分享、版本、网络、状态栏和页面控制。</p>
             </div>
             <span class="badge" id="bridgeBadge">检测中</span>
         </div>
         <div class="button-grid three">
             <button type="button" data-native="toast">原生 Toast</button>
             <button type="button" data-native="copy">复制文本</button>
-            <button type="button" data-native="version">读取版本</button>
+            <button type="button" data-native="version">读取 WebForge 版本</button>
+            <button type="button" data-native="app-version">读取应用版本</button>
+            <button type="button" data-native="share">分享测试文本</button>
             <button type="button" data-native="network">读取网络</button>
             <button type="button" class="secondary" data-native="light">浅色状态栏</button>
             <button type="button" class="secondary" data-native="dark">深色状态栏</button>
@@ -789,7 +791,8 @@
             <input id="phoneNumber" type="text" value="10086" inputmode="tel">
         </div>
         <div class="button-grid">
-            <button type="button" id="openTel">拨打电话</button>
+            <button type="button" id="openTel">测试 tel: 链接</button>
+            <button type="button" id="openDialer">原生拨号器</button>
             <button type="button" id="openSms">发送短信</button>
             <button type="button" class="secondary" id="openMail">发送邮件</button>
             <button type="button" class="secondary" id="openGeo">地图 scheme</button>
@@ -1066,7 +1069,7 @@
                 return;
             }
             log("申请权限：" + type);
-            safeCall("requestPermission", [type, "onNativePermissionResult"]);
+            safeCall("requestPermissionsWithCallback", [type, "onNativePermissionResult"]);
         }
 
         function clearFilePreviews() {
@@ -1388,42 +1391,49 @@
             var result = document.getElementById("bridgeResult");
             switch (action) {
                 case "toast":
-                    safeCall("toast", ["Frameweb H5 测试成功"]);
-                    result.textContent = "已调用 Android.toast";
+                    safeCall("showToast", ["Frameweb H5 测试成功"]);
+                    result.textContent = "已调用 Android.showToast";
                     break;
                 case "copy":
                     var text = "webforge clipboard " + new Date().toISOString();
-                    safeCall("copyText", [text]);
-                    result.textContent = "已复制：" + text;
+                    safeCall("copyToClipboard", [text]);
+                    result.textContent = "已请求复制：" + text;
                     break;
                 case "version":
                     result.textContent = "WebForge 版本："
                         + String(safeCall("getWebForgeVersion"));
+                    break;
+                case "app-version":
+                    var versionName = safeCall("getAppVersionName");
+                    result.textContent = versionName ? "应用版本：" + versionName : "无法读取应用版本";
+                    break;
+                case "share":
+                    result.textContent = safeCall("shareText", ["来自 WebForge H5 Demo 的分享"])
+                        === null ? "无法调用系统分享接口" : "已请求打开系统分享面板";
                     break;
                 case "network":
                     result.textContent = "网络类型："
                         + String(safeCall("getNetworkType"));
                     break;
                 case "light":
-                    safeCall("setStatusBarColor", ["FFFFFF", 2]);
-                    safeCall("setTransparentForWindow", [1]);
+                    safeCall("setStatusBarColor", ["#FFFFFF", 0]);
                     result.textContent = "已设置浅色状态栏";
                     break;
                 case "dark":
-                    safeCall("setStatusBarColor", ["0F172A", 1]);
+                    safeCall("setStatusBarColor", ["#0F172A", 1]);
                     result.textContent = "已设置深色状态栏";
                     break;
                 case "reload":
-                    safeCall("reload");
+                    safeCall("reloadPage");
                     result.textContent = "已调用原生刷新";
                     break;
                 case "history":
-                    safeCall("finishPagebyHistory");
+                    safeCall("goBackOrClose");
                     result.textContent = "已调用历史返回";
                     break;
                 case "exit":
                     if (window.confirm("确认关闭当前 WebView 页面？")) {
-                        safeCall("exitWebview");
+                        safeCall("closePage");
                     }
                     break;
             }
@@ -1493,6 +1503,9 @@
                     location.href = "tel:" + encodeURIComponent(phone);
                 }
             });
+            $("#openDialer").addEventListener("click", function () {
+                safeCall("openDialer", [$("#phoneNumber").value.trim()]);
+            });
             $("#openSms").addEventListener("click", function () {
                 var phone = $("#phoneNumber").value.trim();
                 if (phone) {
@@ -1511,10 +1524,10 @@
                     + encodeURIComponent("上海市人民广场");
             });
             $("#openBrowser").addEventListener("click", function () {
-                safeCall("openBrowser", ["https://www.baidu.com"]);
+                safeCall("openExternalBrowser", ["https://www.baidu.com"]);
             });
             $("#openGaode").addEventListener("click", function () {
-                safeCall("openGaode", [
+                safeCall("openAmapRoute", [
                     "121.4737", "31.2304", "人民广场",
                     "121.4903", "31.2397", "外滩"
                 ]);
@@ -1567,7 +1580,7 @@
             });
             $("#openRemoteBrowser").addEventListener("click", function () {
                 var url = $("#remoteUrl").value.trim();
-                safeCall("openBrowser", [url]);
+                safeCall("openExternalBrowser", [url]);
             });
             $("#clearLogs").addEventListener("click", function () {
                 $("#logList").innerHTML = "";
